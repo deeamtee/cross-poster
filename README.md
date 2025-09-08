@@ -71,11 +71,11 @@ src/
 
 ## Commands
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run lint` - Run ESLint
-- `npm run preview` - Preview production build
-- `npm run deploy` - Deploy to GitHub Pages
+- `pnpm dev` - Start development server
+- `pnpm build` - Build for production
+- `pnpm lint` - Run ESLint
+- `pnpm preview` - Preview production build
+- `pnpm deploy` - Deploy to GitHub Pages
 
 ## Deployment
 
@@ -83,7 +83,7 @@ The project is automatically deployed to GitHub Pages via GitHub Actions on ever
 
 Manual deployment:
 ```bash
-npm run deploy
+pnpm deploy
 ```
 
 ## License
