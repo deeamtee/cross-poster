@@ -2,6 +2,8 @@
 
 A React + TypeScript application for cross-posting content to multiple social media platforms simultaneously.
 
+🚀 **Live Demo**: [https://deeamtee.github.io/cross-poster/](https://deeamtee.github.io/cross-poster/)
+
 ## Features
 
 - 📝 Create text posts with optional images
@@ -69,10 +71,20 @@ src/
 
 ## Commands
 
-- `pnpm dev` - Start development server
-- `pnpm build` - Build for production
-- `pnpm lint` - Run ESLint
-- `pnpm preview` - Preview production build
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build
+- `npm run deploy` - Deploy to GitHub Pages
+
+## Deployment
+
+The project is automatically deployed to GitHub Pages via GitHub Actions on every push to the `master` branch.
+
+Manual deployment:
+```bash
+npm run deploy
+```
 
 ## License
 
