@@ -10,52 +10,106 @@ export const PublishResults: React.FC<PublishResultsProps> = ({ results, onClose
   if (!results) return null;
 
   return (
-    <div className="results-overlay">
-      <div className="results-modal">
-        <h2>Результаты публикации</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg max-w-lg w-full">
+        <div className="p-6 border-b">
+          <h2 className="text-2xl font-bold text-gray-800">Результаты публикации</h2>
+          <p className="text-gray-600 mt-1">Обзор результатов публикации по платформам</p>
+        </div>
         
-        <div className="results-summary">
-          <div className="summary-item success">
-            <strong>Успешно:</strong> {results.totalSuccess}
-          </div>
-          <div className="summary-item failure">
-            <strong>Ошибки:</strong> {results.totalFailure}
-          </div>
-        </div>
-
-        <div className="results-details">
-          {results.results.map((result, index) => (
-            <div
-              key={`${result.platform}-${index}`}
-              className={`result-item ${result.success ? 'success' : 'error'}`}
-            >
-              <div className="result-header">
-                <strong>{result.platform.toUpperCase()}</strong>
-                <span className={`status ${result.success ? 'success' : 'error'}`}>
-                  {result.success ? '✓' : '✗'}
-                </span>
+        <div className="p-6">
+          {/* Summary */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <div className="w-5 h-5 bg-green-600 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs">✓</span>
+                </div>
+                <span className="font-semibold text-green-800">Успешно</span>
               </div>
-              
-              {result.success ? (
-                <div className="result-success">
-                  Пост успешно опубликован
-                  {result.messageId && (
-                    <div className="message-id">ID: {result.messageId}</div>
-                  )}
-                </div>
-              ) : (
-                <div className="result-error">
-                  <strong>Ошибка:</strong> {result.error}
-                </div>
-              )}
+              <div className="text-2xl font-bold text-green-800">{results.totalSuccess}</div>
             </div>
-          ))}
-        </div>
+            
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs">×</span>
+                </div>
+                <span className="font-semibold text-red-800">Ошибки</span>
+              </div>
+              <div className="text-2xl font-bold text-red-800">{results.totalFailure}</div>
+            </div>
+          </div>
 
-        <div className="results-actions">
-          <button onClick={onClose} className="btn-primary">
-            Закрыть
-          </button>
+          {/* Detailed Results */}
+          <div className="space-y-3 mb-6">
+            {results.results.map((result, index) => (
+              <div
+                key={`${result.platform}-${index}`}
+                className={`border rounded-lg p-4 ${
+                  result.success 
+                    ? 'bg-green-50 border-green-200' 
+                    : 'bg-red-50 border-red-200'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                      result.success 
+                        ? 'bg-green-600 text-white' 
+                        : 'bg-red-600 text-white'
+                    }`}>
+                      {result.platform.toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {result.success ? (
+                      <div className="w-5 h-5 bg-green-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                    ) : (
+                      <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">×</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                {result.success ? (
+                  <div className="space-y-2">
+                    <p className="text-green-800 font-medium">
+                      Пост успешно опубликован
+                    </p>
+                    {result.messageId && (
+                      <div className="flex items-center gap-1 text-sm text-green-700">
+                        <span className="text-gray-500">#</span>
+                        <span>ID: {result.messageId}</span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-2">
+                    <div className="w-4 h-4 bg-red-600 rounded-full flex items-center justify-center mt-0.5 shrink-0">
+                      <span className="text-white text-xs">!</span>
+                    </div>
+                    <div className="text-red-800">
+                      <span className="font-medium">Ошибка:</span>
+                      <p className="text-sm mt-1">{result.error}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-center">
+            <button 
+              onClick={onClose} 
+              className="px-8 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Закрыть
+            </button>
+          </div>
         </div>
       </div>
     </div>

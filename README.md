@@ -24,17 +24,33 @@ A React + TypeScript application for cross-posting content to multiple social me
    pnpm install
    ```
 
-2. Start development server:
+2. Set up environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+   Then edit `.env` and add your Firebase configuration values.
+
+3. Start development server:
    ```bash
    pnpm dev
    ```
 
-3. Configure your platforms:
+4. Configure your platforms:
    - Click the "⚙️ Settings" button
    - Add your API credentials
    - Enable the platforms you want to use
 
 ## Platform Setup
+
+### Environment Variables
+
+⚠️ **Security Notice**: Never commit your `.env` file to version control. All sensitive data like API keys and tokens are stored in environment variables.
+
+Required environment variables (see `.env.example`):
+- `VITE_FIREBASE_API_KEY` - Firebase API key
+- `VITE_FIREBASE_AUTH_DOMAIN` - Firebase auth domain  
+- `VITE_FIREBASE_PROJECT_ID` - Firebase project ID
+- Other Firebase configuration values
 
 ### Telegram
 1. Create a bot via [@BotFather](https://t.me/botfather)
