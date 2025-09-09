@@ -1,7 +1,7 @@
 // Post types
 export interface PostDraft {
   content: string;
-  images?: string[];
+  images?: File[];
 }
 
 // Platform types

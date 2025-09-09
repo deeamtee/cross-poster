@@ -77,7 +77,11 @@ export class VKService {
       }
 
       // For VK, we need to upload images first, then post with attachments
-      // This is a simplified version - in a real app, you'd need to implement image upload
+      // This is a simplified version - VK image upload requires multiple steps:
+      // 1. Get upload server URL
+      // 2. Upload image to the server
+      // 3. Save the image and get attachment ID
+      // 4. Post with attachment
       // For now, we'll just post the text and note that images aren't supported yet
       return {
         platform: 'vk',
