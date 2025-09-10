@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Header } from '../../../widgets/header';
 import { PostComposer } from '../../../widgets/post-composer';
 import { ConfigPanel } from '../../../widgets/config-panel';
-import { PublishResults } from '../../../features/publishing';
+import { PublishResultsModal } from '../../../features/publishing';
 import { AuthModal } from '../../../features/auth';
 import { useAuth } from '../../../features/auth/model';
 import type { AppConfig, PublishResponse } from '../../../shared/types';
@@ -90,7 +90,7 @@ export const MainPage: React.FC<MainPageProps> = ({
         onClose={() => setShowAuth(false)}
       />
 
-      <PublishResults
+      <PublishResultsModal
         results={publishResults}
         onClose={() => setPublishResults(null)}
       />

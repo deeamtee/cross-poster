@@ -8,7 +8,7 @@ interface PublishResultsProps {
   onClose: () => void;
 }
 
-export const PublishResults: React.FC<PublishResultsProps> = ({ results, onClose }) => {
+export const PublishResultsModal: React.FC<PublishResultsProps> = ({ results, onClose }) => {
   if (!results) return null;
 
   return (

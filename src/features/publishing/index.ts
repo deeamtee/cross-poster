@@ -1,1 +1,1 @@
-export { PublishResults } from './ui';
+export { PublishResultsModal } from './ui';
