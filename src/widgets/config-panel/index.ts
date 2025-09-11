@@ -1,1 +1,1 @@
-export { ConfigPanel } from './ui';
+export { ConfigPanel, ConfigForm } from './ui';

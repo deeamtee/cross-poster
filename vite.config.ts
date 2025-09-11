@@ -9,7 +9,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  base: '/cross-poster/',
+  server: {
+    port: 5173,
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

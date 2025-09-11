@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { MainPage } from '../pages';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { MainPage, SettingsPage, AccessKeysPage, SettingsOverviewPage } from '../pages';
 import { useAuth } from '../features/auth/model';
 import { configApi } from '../shared/api';
 import { Spinner } from '../shared/ui';
@@ -71,11 +72,31 @@ function App() {
   }
 
   return (
-    <MainPage
-      config={config}
-      onConfigChange={handleConfigChange}
-      configLoading={configLoading}
-    />
+    <Router>
+      <Routes>
+        <Route 
+          path="/" 
+          element={
+            <MainPage
+              config={config}
+              configLoading={configLoading}
+            />
+          } 
+        />
+        <Route path="/settings" element={<SettingsPage />}>
+          <Route index element={<SettingsOverviewPage />} />
+          <Route 
+            path="access-keys" 
+            element={
+              <AccessKeysPage
+                config={config}
+                onConfigChange={handleConfigChange}
+              />
+            } 
+          />
+        </Route>
+      </Routes>
+    </Router>
   );
 }
 

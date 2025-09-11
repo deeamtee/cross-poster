@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Header } from '../../../widgets/header';
 import { PostComposer } from '../../../widgets/post-composer';
-import { ConfigPanel } from '../../../widgets/config-panel';
 import { PublishResultsModal } from '../../../features/publishing';
 import { AuthModal } from '../../../features/auth';
 import { useAuth } from '../../../features/auth/model';
@@ -9,26 +8,19 @@ import type { AppConfig, PublishResponse } from '../../../shared/types';
 
 interface MainPageProps {
   config: AppConfig;
-  onConfigChange: (config: AppConfig) => void;
   configLoading: boolean;
 }
 
 export const MainPage: React.FC<MainPageProps> = ({ 
   config, 
-  onConfigChange, 
   configLoading 
 }) => {
   const { isAuthenticated } = useAuth();
-  const [showConfig, setShowConfig] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [publishResults, setPublishResults] = useState<PublishResponse | null>(null);
 
   const handleAuthClick = () => {
     setShowAuth(true);
-  };
-
-  const handleSettingsClick = () => {
-    setShowConfig(true);
   };
 
   const handlePublishComplete = (results: PublishResponse) => {
@@ -49,7 +41,6 @@ export const MainPage: React.FC<MainPageProps> = ({
   return (
     <div className="min-h-screen bg-gray-100">
       <Header 
-        onSettingsClick={handleSettingsClick}
         onAuthClick={handleAuthClick}
       />
 
@@ -78,13 +69,6 @@ export const MainPage: React.FC<MainPageProps> = ({
       </main>
 
       {/* Modals */}
-      <ConfigPanel
-        config={config}
-        isOpen={showConfig && isAuthenticated}
-        onConfigChange={onConfigChange}
-        onClose={() => setShowConfig(false)}
-      />
-
       <AuthModal
         isOpen={showAuth}
         onClose={() => setShowAuth(false)}

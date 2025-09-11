@@ -1,5 +1,5 @@
-// Re-export all shared utilities
-export { cn } from './utils';
-export { formatDate } from './date';
-export { validateConfig } from './validation';
-export { storage } from './storage';
+export * from './date';
+export * from './storage';
+export * from './utils';
+export * from './validation';
+export * from './vk-id';
