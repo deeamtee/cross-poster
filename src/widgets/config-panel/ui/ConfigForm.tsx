@@ -16,15 +16,13 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({
 }) => {
   const [formData, setFormData] = useState<AppConfig>(config);
 
-  useEffect(() => {
-    setFormData(config);
-  }, [config]);
-
   // Auto-save with debounce when showActions is false
   useEffect(() => {
     if (!showActions) {
       const timeoutId = setTimeout(() => {
-        if (JSON.stringify(formData) !== JSON.stringify(config)) {
+        // Deep compare the formData and config objects
+        const isDifferent = JSON.stringify(formData.platforms) !== JSON.stringify(config.platforms);
+        if (isDifferent) {
           onConfigChange(formData);
         }
       }, 1000); // 1 second debounce
@@ -34,15 +32,18 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({
   }, [formData, config, onConfigChange, showActions]);
 
   const updatePlatformConfig = (platform: 'telegram', enabled: boolean, configData: TelegramConfig) => {
-    const newPlatforms = formData.platforms.map(p => {
-      if (p.platform === platform) {
-        return { ...p, enabled, config: configData };
-      }
-      return p;
-    });
+    const newPlatforms = [...formData.platforms];
+    const existingPlatformIndex = newPlatforms.findIndex(p => p.platform === platform);
 
-    // If platform doesn't exist, add it
-    if (!formData.platforms.find(p => p.platform === platform)) {
+    if (existingPlatformIndex >= 0) {
+      // Update existing platform
+      newPlatforms[existingPlatformIndex] = {
+        ...newPlatforms[existingPlatformIndex],
+        enabled,
+        config: configData,
+      };
+    } else {
+      // Add new platform
       newPlatforms.push({
         platform,
         enabled,
@@ -88,10 +89,10 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <label htmlFor="telegram-enabled" className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-gray-700">
               Включить Telegram
-            </label>
-            <div className="relative inline-block w-12 h-6">
+            </span>
+            <label htmlFor="telegram-enabled" className="relative inline-block w-12 h-6 cursor-pointer">
               <input
                 type="checkbox"
                 id="telegram-enabled"
@@ -102,7 +103,7 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({
                 className="sr-only peer"
               />
               <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </div>
+            </label>
           </div>
           
           {telegramConfig.enabled && (

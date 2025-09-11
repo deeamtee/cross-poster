@@ -1,5 +1,6 @@
 import React, { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import { ImagePreview } from '../../../core/ui';
+import { getPlatformDisplayName } from '../../../modules/platform';
 import type { PostDraft } from '../../../core/types';
 import type { Platform } from '../../../modules/platform';
 
@@ -280,7 +281,7 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      <span className="font-medium text-green-800 capitalize">{platform}</span>
+                      <span className="font-medium text-green-800">{getPlatformDisplayName(platform)}</span>
                     </div>
                     <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
                       Готов

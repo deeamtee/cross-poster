@@ -1,7 +1,14 @@
 import { getFirestore, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { encryptionApi, type EncryptedData } from './encryption';
+import { encryptionApi } from '.';
 import type { AppConfig } from '../core/types';
+
+// Define the interface inline to avoid import issues
+interface EncryptedData {
+  encryptedData: string;
+  iv: string;
+  salt: string;
+}
 
 export const configApi = {
   async saveConfig(config: AppConfig): Promise<void> {
@@ -76,8 +83,15 @@ export const configApi = {
       const decryptedConfigJson = await encryptionApi.decrypt(encryptedData, user.uid);
       const config: AppConfig = JSON.parse(decryptedConfigJson);
 
+      // Sanitize the loaded configuration to ensure it conforms to current types
+      const sanitizedConfig: AppConfig = {
+        platforms: config.platforms.filter(platformConfig => 
+          platformConfig.platform === 'telegram'
+        )
+      };
+
       console.log('Configuration loaded securely from Firestore');
-      return config;
+      return sanitizedConfig;
     } catch (error) {
       console.error('Failed to load configuration:', error);
       return null;

@@ -2,4 +2,4 @@
 export * from './store';
 export * from './model';
 export * from './types';
-export { getConfiguredPlatforms } from './utils';
+export { getConfiguredPlatforms, getPlatformDisplayName } from './utils';
