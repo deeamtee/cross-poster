@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../features/auth/model';
+import { useAuth } from '../../../modules/auth/hooks/context';
 
 interface HeaderProps {
   onAuthClick?: () => void;

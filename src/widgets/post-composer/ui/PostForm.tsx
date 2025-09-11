@@ -1,12 +1,12 @@
 import React, { useState, useRef, useMemo, useEffect, useCallback } from 'react';
-import type { DragEvent } from 'react';
-import type { PostDraft } from '../../../shared/types';
-import { ImagePreview } from '../../../shared/ui/image-preview';
+import { ImagePreview } from '../../../core/ui';
+import type { PostDraft } from '../../../core/types';
+import type { Platform } from '../../../modules/platform';
 
 interface PostFormProps {
   onSubmit: (post: PostDraft) => void;
   isPublishing: boolean;
-  configuredPlatforms: string[];
+  configuredPlatforms: Platform[];
 }
 
 export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, configuredPlatforms }) => {
@@ -75,7 +75,7 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
     }
   }, [handleFiles]);
 
-  const handleDrop = useCallback((e: DragEvent<HTMLDivElement>) => {
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
@@ -83,13 +83,13 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
     handleFiles(e.dataTransfer.files);
   }, [handleFiles]);
 
-  const handleDragLeave = useCallback((e: DragEvent<HTMLDivElement>) => {
+  const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
   }, []);
 
-  const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(true);

@@ -1,1 +1,0 @@
-export type { Platform, PlatformConfig, AppConfig } from '../../../shared/types';

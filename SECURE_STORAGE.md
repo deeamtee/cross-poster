@@ -2,7 +2,7 @@
 
 ## Overview
 
-This implementation replaces the insecure localStorage-based configuration storage with encrypted Firebase Firestore storage for user credentials (Telegram bot tokens, VK access tokens, etc.).
+This implementation replaces the insecure localStorage-based configuration storage with encrypted Firebase Firestore storage for user credentials (Telegram bot tokens, etc.).
 
 ## Security Features
 

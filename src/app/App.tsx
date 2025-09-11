@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { MainPage, SettingsPage, AccessKeysPage, SettingsOverviewPage } from '../pages';
-import { useAuth } from '../features/auth/model';
-import { configApi } from '../shared/api';
-import { Spinner } from '../shared/ui';
-import type { AppConfig } from '../shared/types';
+import { useAuth } from '../modules/auth/hooks/context';
+import { configApi } from '../services/config';
+import { Spinner } from '../core/ui/spinner';
+import type { AppConfig } from '../core/types';
 
 function App() {
   const { user, loading: authLoading } = useAuth();

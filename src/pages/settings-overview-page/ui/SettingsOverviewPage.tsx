@@ -3,29 +3,27 @@ import { Link } from 'react-router-dom';
 
 export const SettingsOverviewPage: React.FC = () => {
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Настройки</h1>
-        <p className="text-gray-600">
-          Управляйте настройками приложения и конфигурацией платформ
-        </p>
+    <div className="max-w-4xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Настройки приложения</h1>
+        <p className="text-gray-600">Управление конфигурацией и подключением к платформам</p>
       </div>
-      
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Link
-          to="/settings/access-keys"
-          className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Link 
+          to="/settings/access-keys" 
+          className="block p-6 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow duration-200"
         >
           <div className="flex items-center mb-4">
             <div className="p-2 bg-blue-100 rounded-lg">
               <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m0 0a2 2 0 012 2m-2-2a2 2 0 00-2 2m0 0a2 2 0 01-2 2m2-2v6a2 2 0 01-2 2H7a2 2 0 01-2-2V9a2 2 0 012-2h8zm-8 2v6h8V9H7z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
               </svg>
             </div>
             <h3 className="ml-3 text-lg font-semibold text-gray-900">Ключи доступа</h3>
           </div>
           <p className="text-gray-600">
-            Настройте токены и ключи для подключения к Telegram, VK и другим платформам
+            Настройте токены и ключи для подключения к Telegram и другим платформам
           </p>
         </Link>
         
@@ -51,10 +49,10 @@ export const SettingsOverviewPage: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <h3 className="ml-3 text-lg font-semibold text-gray-400">Общие настройки</h3>
+            <h3 className="ml-3 text-lg font-semibold text-gray-400">Настройки приложения</h3>
           </div>
           <p className="text-gray-400">
-            Тема оформления, язык интерфейса и другие настройки (скоро)
+            Общие настройки и предпочтения (скоро)
           </p>
         </div>
       </div>

@@ -7,7 +7,7 @@ A React + TypeScript application for cross-posting content to multiple social me
 ## Features
 
 - 📝 Create text posts with optional images
-- 📱 Publish to Telegram and VK with one click
+- 📱 Publish to Telegram with one click
 - ⚙️ Easy platform configuration
 - 📊 Real-time publishing results
 - 💾 Persistent settings storage
@@ -15,7 +15,6 @@ A React + TypeScript application for cross-posting content to multiple social me
 ## Supported Platforms
 
 - **Telegram** - via Bot API
-- **VK** - via VK API (text posts)
 
 ## Quick Start
 
@@ -57,11 +56,6 @@ Required environment variables (see `.env.example`):
 2. Get your bot token
 3. Add the bot to your channel/group and get the Chat ID
 
-### VK
-1. Get an access token from [vkhost.github.io](https://vkhost.github.io/)
-2. Ensure permissions: `wall,photos,groups`
-3. Get your Group ID or User ID for posting
-
 ## Tech Stack
 
 - **Frontend**: React 19 + TypeScript
@@ -79,7 +73,6 @@ src/
 │   └── PublishResults.tsx # Results display
 ├── services/            # API services
 │   ├── telegram.ts      # Telegram Bot API
-│   ├── vk.ts           # VK API
 │   └── index.ts        # Cross-poster coordinator
 ├── types/              # TypeScript type definitions
 └── App.tsx             # Main application component

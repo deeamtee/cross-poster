@@ -1,0 +1,1 @@
+export type { Platform, PlatformConfig, AppConfig } from '../../core/types';

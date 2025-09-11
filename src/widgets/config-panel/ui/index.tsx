@@ -1,27 +1,30 @@
 import React from 'react';
-import { Modal } from '../../../shared/ui';
 import { ConfigForm } from './ConfigForm';
-import type { AppConfig } from '../../../shared/types';
+import { Modal } from '../../../core/ui/modal';
+import type { AppConfig } from '../../../core/types';
 
 interface ConfigPanelProps {
   config: AppConfig;
-  isOpen: boolean;
+  isOpen?: boolean;
   onConfigChange: (config: AppConfig) => void;
-  onClose: () => void;
+  onClose?: () => void;
+  showActions?: boolean;
 }
 
 export const ConfigPanel: React.FC<ConfigPanelProps> = ({ 
   config, 
-  isOpen, 
+  isOpen = true, 
   onConfigChange, 
-  onClose 
+  onClose,
+  showActions = true
 }) => {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Настройки платформ">
+    <Modal isOpen={isOpen} onClose={onClose || (() => {})} title="Настройки платформ">
       <ConfigForm
         config={config}
         onConfigChange={onConfigChange}
         onClose={onClose}
+        showActions={showActions}
       />
     </Modal>
   );

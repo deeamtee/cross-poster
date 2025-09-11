@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { getConfiguredPlatforms } from '../../../entities/platform';
-import { CrossPosterService } from '../../../shared/api/cross-poster';
+import { getConfiguredPlatforms } from '../../../modules/platform';
+import { crossPosterService } from '../../../services/cross-poster';
 import { PostForm } from './PostForm';
-import type { AppConfig, PostDraft, PublishResponse } from '../../../shared/types';
+import type { AppConfig, PostDraft, PublishResponse } from '../../../core/types';
 
 interface PostComposerProps {
   config: AppConfig;
@@ -18,8 +18,7 @@ export const PostComposer: React.FC<PostComposerProps> = ({ config, onPublishCom
     setIsPublishing(true);
     
     try {
-      const crossPoster = new CrossPosterService(config);
-      const results = await crossPoster.publishPost(post);
+      const results = await crossPosterService.publishPost(post, config);
       onPublishComplete(results);
     } catch (error) {
       console.error('Publishing failed:', error);

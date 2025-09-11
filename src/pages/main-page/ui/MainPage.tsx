@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Header } from '../../../widgets/header';
 import { PostComposer } from '../../../widgets/post-composer';
-import { PublishResultsModal } from '../../../features/publishing';
-import { AuthModal } from '../../../features/auth';
-import { useAuth } from '../../../features/auth/model';
-import type { AppConfig, PublishResponse } from '../../../shared/types';
+import { PublishResultsModal } from '../../../modules/publishing/components';
+import { AuthModal } from '../../../modules/auth/components';
+import { useAuth } from '../../../modules/auth/hooks/context';
+import type { AppConfig, PublishResponse } from '../../../core/types';
 
 interface MainPageProps {
   config: AppConfig;

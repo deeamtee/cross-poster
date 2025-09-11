@@ -1,3 +1,2 @@
-// Re-export app layer modules
-export { withProviders } from './providers';
-export { providers } from './providers';
+export { withProviders } from './providers/with-providers';
+export { providers } from './providers/providers';

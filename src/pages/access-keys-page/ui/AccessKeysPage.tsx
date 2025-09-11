@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ConfigForm } from '../../../widgets/config-panel';
-import type { AppConfig } from '../../../shared/types';
+import { ConfigPanel } from '../../../widgets/config-panel';
+import type { AppConfig } from '../../../core/types';
 
 interface AccessKeysPageProps {
   config: AppConfig;
@@ -53,7 +53,7 @@ export const AccessKeysPage: React.FC<AccessKeysPageProps> = ({
         </p>
       </div>
       
-      <ConfigForm
+      <ConfigPanel
         config={config}
         onConfigChange={handleConfigChange}
         showActions={false}
