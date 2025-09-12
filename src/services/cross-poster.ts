@@ -1,5 +1,5 @@
-import { telegramApi } from './telegram';
 import type { AppConfig, PostDraft, PublishResponse, PostResult, TelegramConfig } from '../core/types';
+import { TelegramService } from './telegram';
 
 export class CrossPosterService {
   private telegramConfig?: TelegramConfig;
@@ -40,9 +40,10 @@ export class CrossPosterService {
     // Publish to Telegram if configured
     if (this.telegramConfig) {
       console.log('Publishing to Telegram with config:', this.telegramConfig);
+      const telegramService = new TelegramService(this.telegramConfig);
       const result = post.images && post.images.length > 0
-        ? await telegramApi.publishPostWithImages(this.telegramConfig, post)
-        : await telegramApi.publishPost(this.telegramConfig, post);
+        ? await telegramService.publishPostWithImages(post)
+        : await telegramService.publishPost(post);
       results.push(result);
     } else {
       console.log('No Telegram config found, skipping Telegram publishing');
