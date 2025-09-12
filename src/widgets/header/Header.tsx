@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../modules/auth/hooks/context';
+import { useAuth } from '../../modules/auth/hooks/context';
+import { getUserDisplayName } from '../../modules/user/utils';
 
 interface HeaderProps {
   onAuthClick?: () => void;
@@ -38,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({ onAuthClick }) => {
               <>
                 <div className="text-right">
                   <p className="text-sm font-medium text-gray-800">
-                    {user.displayName || 'Пользователь'}
+                    {getUserDisplayName(user)}
                   </p>
                   <p className="text-xs text-gray-600">
                     {user.email}

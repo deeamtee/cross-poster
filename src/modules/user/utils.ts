@@ -4,7 +4,7 @@ import type { User } from '../../core/types';
  * Get user display name or fallback to email
  */
 export function getUserDisplayName(user: User): string {
-  return user.displayName || user.email || 'User';
+  return user.displayName || user.email || 'Пользователь';
 }
 
 /**

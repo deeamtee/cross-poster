@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { SettingsSidebar } from '../../../widgets/settings-sidebar';
+import { SettingsSidebar } from '../../widgets/settings-sidebar';
 
 export const SettingsPage: React.FC = () => {
   return (

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { MainPage, SettingsPage, AccessKeysPage, SettingsOverviewPage } from '../pages';
+import { ProfilePage } from '../pages/profile-page';
 import { useAuth } from '../modules/auth/hooks/context';
 import { configApi } from '../services/config';
 import { Spinner } from '../core/ui/spinner';
@@ -15,6 +16,7 @@ function App() {
   useEffect(() => {
     if (!user) {
       // Clear config when user logs out
+      console.log('User logged out, clearing config');
       setConfig({ platforms: [] });
       return;
     }
@@ -23,13 +25,18 @@ function App() {
     const loadConfig = async () => {
       setConfigLoading(true);
       try {
+        console.log('Loading config for user:', user.uid);
         // First, try to migrate from localStorage if needed
         await configApi.migrateFromLocalStorage();
         
         // Load from Firestore
         const savedConfig = await configApi.loadConfig();
+        console.log('Loaded config:', savedConfig);
         if (savedConfig) {
           setConfig(savedConfig);
+        } else {
+          console.log('No saved config found, using default config');
+          setConfig({ platforms: [] });
         }
       } catch (error) {
         console.error('Failed to load config:', error);
@@ -46,6 +53,7 @@ function App() {
   const handleConfigChange = async (newConfig: AppConfig) => {
     if (!user) return;
     
+    console.log('Config changed:', newConfig);
     setConfig(newConfig);
     
     // Save to Firestore
@@ -93,6 +101,10 @@ function App() {
                 onConfigChange={handleConfigChange}
               />
             } 
+          />
+          <Route 
+            path="profile" 
+            element={<ProfilePage />} 
           />
         </Route>
       </Routes>

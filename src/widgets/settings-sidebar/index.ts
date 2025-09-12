@@ -1,1 +1,1 @@
-export { SettingsSidebar } from './ui';
+export { SettingsSidebar } from './SettingsSidebar';

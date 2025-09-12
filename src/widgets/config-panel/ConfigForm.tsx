@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { AppConfig, TelegramConfig } from '../../../core/types';
+import type { AppConfig, TelegramConfig } from '../../core/types';
 
 interface ConfigFormProps {
   config: AppConfig;
@@ -23,6 +23,7 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({
         // Deep compare the formData and config objects
         const isDifferent = JSON.stringify(formData.platforms) !== JSON.stringify(config.platforms);
         if (isDifferent) {
+          console.log('Auto-saving config:', formData);
           onConfigChange(formData);
         }
       }, 1000); // 1 second debounce
@@ -32,6 +33,7 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({
   }, [formData, config, onConfigChange, showActions]);
 
   const updatePlatformConfig = (platform: 'telegram', enabled: boolean, configData: TelegramConfig) => {
+    console.log('Updating platform config:', { platform, enabled, configData });
     const newPlatforms = [...formData.platforms];
     const existingPlatformIndex = newPlatforms.findIndex(p => p.platform === platform);
 
@@ -63,6 +65,7 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({
   };
 
   const handleSave = () => {
+    console.log('Saving config:', formData);
     onConfigChange(formData);
     if (onClose) {
       onClose();

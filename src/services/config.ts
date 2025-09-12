@@ -12,6 +12,7 @@ interface EncryptedData {
 
 export const configApi = {
   async saveConfig(config: AppConfig): Promise<void> {
+    console.log('Saving config to Firestore:', config);
     const db = getFirestore();
     const auth = getAuth();
     const user = auth.currentUser;
@@ -45,6 +46,7 @@ export const configApi = {
   },
 
   async loadConfig(): Promise<AppConfig | null> {
+    console.log('Loading config from Firestore');
     const db = getFirestore();
     const auth = getAuth();
     const user = auth.currentUser;
@@ -83,12 +85,19 @@ export const configApi = {
       const decryptedConfigJson = await encryptionApi.decrypt(encryptedData, user.uid);
       const config: AppConfig = JSON.parse(decryptedConfigJson);
 
+      console.log('Decrypted config:', config);
+
       // Sanitize the loaded configuration to ensure it conforms to current types
+      // Make sure we preserve all valid platform configurations
       const sanitizedConfig: AppConfig = {
         platforms: config.platforms.filter(platformConfig => 
-          platformConfig.platform === 'telegram'
+          platformConfig.platform === 'telegram' && 
+          platformConfig.config &&
+          typeof platformConfig.config === 'object'
         )
       };
+
+      console.log('Sanitized config:', sanitizedConfig);
 
       console.log('Configuration loaded securely from Firestore');
       return sanitizedConfig;
@@ -159,6 +168,7 @@ export const configApi = {
       }
 
       const config: AppConfig = JSON.parse(savedConfig);
+      console.log('Migrating localStorage config:', config);
       await this.saveConfig(config);
 
       localStorage.removeItem(legacyConfigKey);

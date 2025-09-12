@@ -1,1 +1,2 @@
-export { ConfigPanel, ConfigForm } from './ui';
+export { ConfigPanel } from './index.tsx';
+export { ConfigForm } from './ConfigForm';

@@ -6,6 +6,7 @@ import {
   signOut as firebaseSignOut,
   onAuthStateChanged,
   sendPasswordResetEmail as firebaseSendPasswordResetEmail,
+  updateProfile as firebaseUpdateProfile,
   type User as FirebaseUser
 } from 'firebase/auth';
 import type { User, AuthCredentials, AuthResult, AuthError } from '../core/types';
@@ -33,6 +34,7 @@ export interface AuthService {
   getCurrentUser(): Promise<User | null>;
   onAuthStateChanged(callback: (user: User | null) => void): () => void;
   sendPasswordResetEmail(email: string): Promise<void>;
+  updateProfile(user: User, profile: { displayName?: string; photoURL?: string }): Promise<User>;
   initialize(): Promise<void>;
 }
 
@@ -131,6 +133,28 @@ class FirebaseAuthService implements AuthService {
 
   async sendPasswordResetEmail(email: string): Promise<void> {
     await firebaseSendPasswordResetEmail(this.auth, email);
+  }
+
+  async updateProfile(user: User, profile: { displayName?: string; photoURL?: string }): Promise<User> {
+    const currentUser = this.auth.currentUser;
+    
+    if (!currentUser) {
+      throw new Error('User not authenticated');
+    }
+    
+    try {
+      await firebaseUpdateProfile(currentUser, profile);
+      
+      // Return updated user object
+      return {
+        ...user,
+        displayName: profile.displayName || user.displayName || null,
+        photoURL: profile.photoURL || user.photoURL || null
+      };
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      throw new Error('Failed to update profile');
+    }
   }
 }
 

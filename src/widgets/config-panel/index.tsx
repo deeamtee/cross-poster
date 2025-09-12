@@ -1,6 +1,6 @@
 import React from 'react';
 import { ConfigForm } from './ConfigForm';
-import type { AppConfig } from '../../../core/types';
+import type { AppConfig } from '../../core/types';
 
 interface ConfigPanelProps {
   config: AppConfig;

@@ -12,11 +12,17 @@ export class CrossPosterService {
     // Reset configs
     this.telegramConfig = undefined;
 
+    console.log('Updating cross-poster config:', config);
+
     config.platforms.forEach(platformConfig => {
-      if (!platformConfig.enabled) return;
+      if (!platformConfig.enabled) {
+        console.log('Platform not enabled, skipping:', platformConfig.platform);
+        return;
+      }
 
       switch (platformConfig.platform) {
         case 'telegram':
+          console.log('Telegram config found:', platformConfig.config);
           this.telegramConfig = platformConfig.config as TelegramConfig;
           break;
       }
@@ -24,6 +30,8 @@ export class CrossPosterService {
   }
 
   async publishPost(post: PostDraft, config: AppConfig): Promise<PublishResponse> {
+    console.log('Publishing post with config:', { post, config });
+    
     // Update config before publishing
     this.updateConfig(config);
     
@@ -31,14 +39,20 @@ export class CrossPosterService {
     
     // Publish to Telegram if configured
     if (this.telegramConfig) {
+      console.log('Publishing to Telegram with config:', this.telegramConfig);
       const result = post.images && post.images.length > 0
         ? await telegramApi.publishPostWithImages(this.telegramConfig, post)
         : await telegramApi.publishPost(this.telegramConfig, post);
       results.push(result);
+    } else {
+      console.log('No Telegram config found, skipping Telegram publishing');
+      console.log('Current config state:', config);
     }
 
     const totalSuccess = results.filter(r => r.success).length;
     const totalFailure = results.filter(r => !r.success).length;
+
+    console.log('Publish results:', { results, totalSuccess, totalFailure });
 
     return {
       results,

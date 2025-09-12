@@ -1,8 +1,8 @@
 import React, { useState, useRef, useMemo, useEffect, useCallback } from 'react';
-import { ImagePreview } from '../../../core/ui';
-import { getPlatformDisplayName } from '../../../modules/platform';
-import type { PostDraft } from '../../../core/types';
-import type { Platform } from '../../../modules/platform';
+import { ImagePreview } from '../../core/ui';
+import { getPlatformDisplayName } from '../../modules/platform';
+import type { PostDraft } from '../../core/types';
+import type { Platform } from '../../modules/platform';
 
 interface PostFormProps {
   onSubmit: (post: PostDraft) => void;
