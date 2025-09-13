@@ -5,17 +5,22 @@ export interface PostDraft {
 }
 
 // Platform types
-export type Platform = 'telegram';
+export type Platform = 'telegram' | 'vk';
 
 export interface PlatformConfig {
   platform: Platform;
   enabled: boolean;
-  config: TelegramConfig;
+  config: TelegramConfig | VKConfig;
 }
 
 export interface TelegramConfig {
   botToken: string;
   chatId: string; // Channel username or chat ID
+}
+
+export interface VKConfig {
+  groupToken: string; // Group token for VK API
+  groupId: string;     // Group ID for VK API
 }
 
 // Application state
@@ -35,6 +40,16 @@ export interface PublishResponse {
   results: PostResult[];
   totalSuccess: number;
   totalFailure: number;
+}
+
+// Health check response
+export interface HealthCheckResponse {
+  success: boolean;
+  data: {
+    status: string;
+    timestamp: string;
+    uptime: number;
+  };
 }
 
 // Encryption types

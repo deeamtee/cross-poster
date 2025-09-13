@@ -13,16 +13,12 @@ export const PostComposer: React.FC<PostComposerProps> = ({ config, onPublishCom
   const [isPublishing, setIsPublishing] = useState(false);
   
   const configuredPlatforms = getConfiguredPlatforms(config);
-  console.log('PostComposer received config:', config);
-  console.log('Configured platforms:', configuredPlatforms);
   
   const handleSubmit = async (post: PostDraft) => {
-    console.log('PostComposer handleSubmit called with:', { post, config });
     setIsPublishing(true);
     
     try {
       const results = await crossPosterService.publishPost(post, config);
-      console.log('PostComposer received results:', results);
       onPublishComplete(results);
     } catch (error) {
       console.error('Publishing failed:', error);

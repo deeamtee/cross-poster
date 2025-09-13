@@ -12,7 +12,6 @@ interface EncryptedData {
 
 export const configApi = {
   async saveConfig(config: AppConfig): Promise<void> {
-    console.log('Saving config to Firestore:', config);
     const db = getFirestore();
     const auth = getAuth();
     const user = auth.currentUser;
@@ -38,7 +37,6 @@ export const configApi = {
         version: '1.0',
       });
 
-      console.log('Configuration saved securely to Firestore');
     } catch (error) {
       console.error('Failed to save configuration:', error);
       throw new Error('Failed to save configuration to secure storage');
@@ -46,7 +44,6 @@ export const configApi = {
   },
 
   async loadConfig(): Promise<AppConfig | null> {
-    console.log('Loading config from Firestore');
     const db = getFirestore();
     const auth = getAuth();
     const user = auth.currentUser;
@@ -65,7 +62,6 @@ export const configApi = {
       const docSnap = await getDoc(docRef);
       
       if (!docSnap.exists()) {
-        console.log('No configuration found for user');
         return null;
       }
 
@@ -85,21 +81,14 @@ export const configApi = {
       const decryptedConfigJson = await encryptionApi.decrypt(encryptedData, user.uid);
       const config: AppConfig = JSON.parse(decryptedConfigJson);
 
-      console.log('Decrypted config:', config);
-
-      // Sanitize the loaded configuration to ensure it conforms to current types
-      // Make sure we preserve all valid platform configurations
       const sanitizedConfig: AppConfig = {
         platforms: config.platforms.filter(platformConfig => 
-          platformConfig.platform === 'telegram' && 
+          (platformConfig.platform === 'telegram' || platformConfig.platform === 'vk') && 
           platformConfig.config &&
           typeof platformConfig.config === 'object'
         )
       };
 
-      console.log('Sanitized config:', sanitizedConfig);
-
-      console.log('Configuration loaded securely from Firestore');
       return sanitizedConfig;
     } catch (error) {
       console.error('Failed to load configuration:', error);
@@ -119,7 +108,6 @@ export const configApi = {
     try {
       const docRef = doc(db, 'user-configs', user.uid);
       await deleteDoc(docRef);
-      console.log('Configuration deleted from Firestore');
     } catch (error) {
       console.error('Failed to delete configuration:', error);
       throw new Error('Failed to delete configuration from secure storage');
@@ -155,7 +143,6 @@ export const configApi = {
 
     try {
       if (await this.hasConfig()) {
-        console.log('User already has Firestore configuration, skipping migration');
         return false;
       }
 
@@ -163,17 +150,14 @@ export const configApi = {
       const savedConfig = localStorage.getItem(legacyConfigKey);
       
       if (!savedConfig) {
-        console.log('No localStorage configuration found for migration');
         return false;
       }
 
       const config: AppConfig = JSON.parse(savedConfig);
-      console.log('Migrating localStorage config:', config);
       await this.saveConfig(config);
 
       localStorage.removeItem(legacyConfigKey);
       
-      console.log('Successfully migrated configuration from localStorage to Firestore');
       return true;
     } catch (error) {
       console.error('Failed to migrate configuration from localStorage:', error);
