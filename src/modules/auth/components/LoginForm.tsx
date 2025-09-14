@@ -1,29 +1,25 @@
 import React, { useState } from 'react';
-import { useAuth } from '../hooks/context';
-import type { AuthCredentials } from '../../../core/types';
+import { Button } from '@core/ui/button';
+import { Input } from '@core/ui/input';
+import { Spinner } from '@core/ui/spinner';
+import type { AuthCredentials } from '@core/types';
+import { useAuth } from '..';
 
 interface LoginFormProps {
   onSwitchToSignUp: () => void;
   onSwitchToPasswordReset: () => void;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({ 
-  onSwitchToSignUp, 
-  onSwitchToPasswordReset 
-}) => {
-  const [credentials, setCredentials] = useState<AuthCredentials>({
-    email: '',
-    password: ''
-  });
-  const [loading, setLoading] = useState(false);
+export const LoginForm = ({ onSwitchToSignUp, onSwitchToPasswordReset }: LoginFormProps) => {
+  const [credentials, setCredentials] = useState<AuthCredentials>({ email: '', password: '' });
   const [error, setError] = useState<string | null>(null);
-  
+  const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
+    setLoading(true);
     
     try {
       const result = await signIn(credentials);
@@ -31,6 +27,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         setError(result.error.message);
       }
     } catch (err) {
+      console.error('Login error:', err);
       setError('Произошла ошибка при входе в систему');
     } finally {
       setLoading(false);
@@ -54,13 +51,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Email
             </label>
-            <input
+            <Input
               id="email"
               type="email"
               required
               value={credentials.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="your@email.com"
             />
           </div>
@@ -69,13 +65,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Пароль
             </label>
-            <input
+            <Input
               id="password"
               type="password"
               required
               value={credentials.password}
               onChange={(e) => handleInputChange('password', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="••••••••"
             />
           </div>
@@ -86,31 +81,31 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             </div>
           )}
           
-          <button
+          <Button
             type="submit"
             disabled={loading}
             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
           >
-            {loading ? 'Вход...' : 'Войти'}
-          </button>
+            {loading ? <Spinner /> : 'Войти'}
+          </Button>
         </form>
         
         <div className="mt-6 text-center space-y-2">
-          <button
+          <Button
             onClick={onSwitchToPasswordReset}
             className="text-blue-600 hover:text-blue-700 text-sm"
           >
             Забыли пароль?
-          </button>
+          </Button>
           
           <div className="text-gray-600 text-sm">
             Нет аккаунта?{' '}
-            <button
+            <Button
               onClick={onSwitchToSignUp}
               className="text-blue-600 hover:text-blue-700 font-medium"
             >
               Зарегистрироваться
-            </button>
+            </Button>
           </div>
         </div>
       </div>

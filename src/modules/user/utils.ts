@@ -1,4 +1,4 @@
-import type { User } from '../../core/types';
+import type { User } from '@core/types';
 
 /**
  * Get user display name or fallback to email

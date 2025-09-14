@@ -1,4 +1,4 @@
-import type { AppConfig, Platform, PlatformConfig, TelegramConfig, VKConfig } from "../../core/types";
+import type { AppConfig, Platform, PlatformConfig, TelegramConfig, VKConfig } from "@core/types";
 
 /**
  * Get configured platforms from app config

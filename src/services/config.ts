@@ -1,7 +1,7 @@
 import { getFirestore, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { encryptionApi } from '.';
-import type { AppConfig } from '../core/types';
+import type { AppConfig } from '@core/types';
 
 // Define the interface inline to avoid import issues
 interface EncryptedData {

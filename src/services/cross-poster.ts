@@ -1,4 +1,4 @@
-import type { AppConfig, PostDraft, PublishResponse, PostResult, TelegramConfig, VKConfig } from '../core/types';
+import type { AppConfig, PostDraft, PublishResponse, PostResult, TelegramConfig, VKConfig } from '@core/types';
 import { TelegramService } from './telegram';
 import { VKService } from './vk';
 

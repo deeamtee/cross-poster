@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../modules/auth/hooks/context';
 import { userProfileService } from '../../services/user-profile';
 import { getUserInitials, hasProfilePhoto } from '../../modules/user/utils';
-import { Spinner } from '../../core/ui/spinner';
+import { Spinner } from '@core/ui/spinner';
 
 export const ProfilePage: React.FC = () => {
   const { user, isAuthenticated } = useAuth();

@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { MainPage, SettingsPage, AccessKeysPage, SettingsOverviewPage } from '../pages';
-import { ProfilePage } from '../pages/profile-page';
-import { useAuth } from '../modules/auth/hooks/context';
-import { configApi } from '../services/config';
-import { Spinner } from '../core/ui/spinner';
-import type { AppConfig } from '../core/types';
+import { MainPage } from '@/pages/main-page'
+import { SettingsPage } from '@/pages/settings-page'
+import { ProfilePage } from '@/pages/profile-page'
+import { AccessKeysPage } from '@/pages/access-keys-page'
+import { useAuth } from '@/modules/auth'
+import { Spinner } from '@core/ui/spinner'
+import type { AppConfig } from '@core/types'
+import { configApi } from '@/services/config'
+import { SettingsOverviewPage } from '@/pages/settings-overview-page'
 
 function App() {
   const { user, loading: authLoading } = useAuth();
@@ -30,6 +33,7 @@ function App() {
           setConfig({ platforms: [] });
         }
       } catch (error) {
+        console.error('Failed to load config:', error);
         setConfig({ platforms: [] });
       } finally {
         setConfigLoading(false);
@@ -47,6 +51,7 @@ function App() {
     try {
       await configApi.saveConfig(newConfig);
     } catch (error) {
+      console.error('Failed to save config:', error);
       alert('Не удалось сохранить конфигурацию. Пожалуйста, попробуйте еще раз.');
     }
   };

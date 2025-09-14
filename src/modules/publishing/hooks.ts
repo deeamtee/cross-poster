@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { crossPosterService } from '../../services/cross-poster';
-import type { PublishResponse, AppConfig } from '../../core/types';
+import type { PublishResponse, AppConfig } from '@core/types';
 import type { PublishPostVariables } from './types';
 
 export const usePublishPost = () => {

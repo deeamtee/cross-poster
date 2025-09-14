@@ -9,7 +9,7 @@ import {
   updateProfile as firebaseUpdateProfile,
   type User as FirebaseUser
 } from 'firebase/auth';
-import type { User, AuthCredentials, AuthResult, AuthError } from '../core/types';
+import type { User, AuthCredentials, AuthResult, AuthError } from '@core/types';
 
 // Firebase config loaded from environment variables
 const firebaseConfig = {

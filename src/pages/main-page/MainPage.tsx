@@ -4,7 +4,7 @@ import { PostComposer } from '../../widgets/post-composer';
 import { PublishResultsModal } from '../../modules/publishing/components';
 import { AuthModal } from '../../modules/auth/components';
 import { useAuth } from '../../modules/auth/hooks/context';
-import type { AppConfig, PublishResponse } from '../../core/types';
+import type { AppConfig, PublishResponse } from '@core/types';
 
 interface MainPageProps {
   config: AppConfig;

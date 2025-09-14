@@ -1,7 +1,7 @@
 import React, { useState, useRef, useMemo, useEffect, useCallback } from 'react';
-import { ImagePreview } from '../../core/ui';
+import { ImagePreview } from '@core/ui';
 import { getPlatformDisplayName } from '../../modules/platform';
-import type { PostDraft } from '../../core/types';
+import type { PostDraft } from '@core/types';
 import type { Platform } from '../../modules/platform';
 
 interface PostFormProps {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { AppConfig, TelegramConfig, VKConfig } from '../../core/types';
+import type { AppConfig, TelegramConfig, VKConfig } from '@core/types';
 
 interface ConfigFormProps {
   config: AppConfig;

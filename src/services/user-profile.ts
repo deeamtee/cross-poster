@@ -1,6 +1,6 @@
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
-import type { User } from '../core/types';
+import type { User } from '@core/types';
 import { authService } from './auth';
 
 /**

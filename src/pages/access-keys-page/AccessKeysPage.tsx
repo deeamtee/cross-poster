@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ConfigPanel } from '../../widgets/config-panel';
-import type { AppConfig } from '../../core/types';
+import type { AppConfig } from '@core/types';
 
 interface AccessKeysPageProps {
   config: AppConfig;

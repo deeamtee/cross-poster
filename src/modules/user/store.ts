@@ -1,4 +1,4 @@
-import type { User } from '../../core/types';
+import type { User } from '@core/types';
 
 export interface UserStore {
   user: User | null;

@@ -1,4 +1,4 @@
-import type { Platform, AppConfig } from '../../core/types';
+import type { Platform, AppConfig } from '@core/types';
 import { initialPlatformState } from './store';
 
 export function getConfiguredPlatforms(config: AppConfig): Platform[] {

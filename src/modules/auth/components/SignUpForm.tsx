@@ -1,52 +1,48 @@
 import React, { useState } from 'react';
-import { useAuth } from '../hooks/context';
-import type { AuthCredentials } from '../../../core/types';
+import { Button } from '@core/ui/button';
+import { Input } from '@core/ui/input';
+import { Spinner } from '@core/ui/spinner';
+import type { AuthCredentials } from '@core/types';
+import { useAuth } from '..';
 
 interface SignUpFormProps {
-  onSwitchToLogin: () => void;
+  onSwitchToSignIn: () => void;
 }
 
-export const SignUpForm: React.FC<SignUpFormProps> = ({ onSwitchToLogin }) => {
-  const [credentials, setCredentials] = useState<AuthCredentials>({
-    email: '',
-    password: ''
-  });
+export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
+  const [credentials, setCredentials] = useState<AuthCredentials>({ email: '', password: '' });
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
+  const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
-
-  const validatePasswords = () => {
-    if (credentials.password !== confirmPassword) {
-      setPasswordError('Пароли не совпадают');
-      return false;
-    }
-    if (credentials.password.length < 6) {
-      setPasswordError('Пароль должен содержать минимум 6 символов');
-      return false;
-    }
-    setPasswordError('');
-    return true;
-  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validatePasswords()) {
+    setError(null);
+    setPasswordError(null);
+    setLoading(true);
+
+    // Password validation
+    if (credentials.password !== confirmPassword) {
+      setPasswordError('Пароли не совпадают');
+      setLoading(false);
       return;
     }
-    
-    setLoading(true);
-    setError(null);
-    
+
+    if (credentials.password.length < 6) {
+      setPasswordError('Пароль должен содержать минимум 6 символов');
+      setLoading(false);
+      return;
+    }
+
     try {
       const result = await signUp(credentials);
       if (result.error) {
         setError(result.error.message);
       }
     } catch (err) {
+      console.error('Sign up error:', err);
       setError('Произошла ошибка при регистрации');
     } finally {
       setLoading(false);
@@ -56,12 +52,11 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onSwitchToLogin }) => {
   const handleInputChange = (field: keyof AuthCredentials, value: string) => {
     setCredentials(prev => ({ ...prev, [field]: value }));
     if (error) setError(null);
-    if (passwordError) setPasswordError('');
   };
 
   const handleConfirmPasswordChange = (value: string) => {
     setConfirmPassword(value);
-    if (passwordError) setPasswordError('');
+    if (passwordError) setPasswordError(null);
   };
 
   return (
@@ -76,13 +71,12 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onSwitchToLogin }) => {
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Email
             </label>
-            <input
+            <Input
               id="email"
               type="email"
               required
               value={credentials.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="your@email.com"
             />
           </div>
@@ -91,13 +85,12 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onSwitchToLogin }) => {
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Пароль
             </label>
-            <input
+            <Input
               id="password"
               type="password"
               required
               value={credentials.password}
               onChange={(e) => handleInputChange('password', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="••••••••"
             />
           </div>
@@ -106,13 +99,12 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onSwitchToLogin }) => {
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
               Подтверждение пароля
             </label>
-            <input
+            <Input
               id="confirmPassword"
               type="password"
               required
               value={confirmPassword}
               onChange={(e) => handleConfirmPasswordChange(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="••••••••"
             />
           </div>
@@ -125,24 +117,24 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onSwitchToLogin }) => {
             </div>
           )}
           
-          <button
+          <Button
             type="submit"
             disabled={loading}
             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
           >
-            {loading ? 'Регистрация...' : 'Зарегистрироваться'}
-          </button>
+            {loading ? <Spinner /> : 'Зарегистрироваться'}
+          </Button>
         </form>
         
         <div className="mt-6 text-center">
           <div className="text-gray-600 text-sm">
             Уже есть аккаунт?{' '}
-            <button
-              onClick={onSwitchToLogin}
+            <Button
+              onClick={onSwitchToSignIn}
               className="text-blue-600 hover:text-blue-700 font-medium"
             >
               Войти
-            </button>
+            </Button>
           </div>
         </div>
       </div>

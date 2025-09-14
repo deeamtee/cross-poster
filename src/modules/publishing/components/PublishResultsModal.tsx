@@ -1,7 +1,7 @@
 import React from 'react';
-import { Modal } from '../../../core/ui/modal';
+import { Modal } from '@core/ui/modal';
 import { PublishResults as LocalPublishResults } from './PublishResults';
-import type { PublishResponse } from '../../../core/types';
+import type { PublishResponse } from '@core/types';
 
 interface PublishResultsProps {
   results: PublishResponse | null;
