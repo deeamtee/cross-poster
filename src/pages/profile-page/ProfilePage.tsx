@@ -3,6 +3,7 @@ import { useAuth } from '../../modules/auth/hooks/context';
 import { userProfileService } from '../../services/user-profile';
 import { getUserInitials, hasProfilePhoto } from '../../modules/user/utils';
 import { Spinner } from '@core/ui/spinner';
+import { Card } from '@core/ui/card';
 
 export const ProfilePage: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
@@ -92,7 +93,7 @@ export const ProfilePage: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <Card>
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Профиль</h2>
         
         <div className="flex flex-col md:flex-row gap-8">
@@ -222,7 +223,7 @@ export const ProfilePage: React.FC = () => {
             <p className="text-green-600 text-sm">{success}</p>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 };

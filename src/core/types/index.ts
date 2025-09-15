@@ -5,7 +5,7 @@ export interface PostDraft {
 }
 
 // Platform types
-export type Platform = 'telegram' | 'vk';
+export type Platform = 'telegram' | 'vk' | 'vkid';
 
 export interface PlatformConfig {
   platform: Platform;
