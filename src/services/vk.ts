@@ -1,4 +1,10 @@
-import type { PostDraft, PostResult, VKConfig } from "@/core/types";
+﻿import type { PostDraft, PostResult, VKConfig } from "@/core/types";
+import {
+  mergeVkConfigWithStoredToken,
+  saveVkTokenFromConfig,
+  isVkTokenExpired,
+  refreshVkToken,
+} from "@/services/vk-token.storage";
 
 export class VKService {
   private config: VKConfig;
@@ -6,48 +12,63 @@ export class VKService {
   private readonly API_KEY = "secret-api-key";
 
   constructor(config: VKConfig) {
-    this.config = config;
+    this.config = { ...config };
+    this.syncConfigWithStorage();
   }
 
-  // Health check endpoint
-  async healthCheck(): Promise<{
-    success: boolean;
-    data?: { status: string; timestamp: string; uptime: number };
-    error?: string;
-  }> {
-    try {
-      const response = await fetch(`${this.API_BASE_URL}/health`, {
-        method: "GET",
-      });
-
-      const data = await response.json();
-      return { success: true, data };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Health check failed",
-      };
+  private syncConfigWithStorage() {
+    const merged = mergeVkConfigWithStoredToken(this.config);
+    Object.assign(this.config, merged);
+    if (this.config.accessToken) {
+      saveVkTokenFromConfig(this.config);
     }
   }
 
+  private async ensureAccessToken(): Promise<{ ownerId: number; accessToken: string } | { error: string }> {
+    this.syncConfigWithStorage();
+
+    if (!this.config.accessToken) {
+      return { error: "VK access token is missing. ���ਧ���� �१ VK ID." };
+    }
+
+    if (isVkTokenExpired(this.config)) {
+      const refreshed = await refreshVkToken(this.config);
+      if (refreshed?.accessToken) {
+        Object.assign(this.config, refreshed);
+      } else {
+        return { error: "VK access token ����. ������ ���ਧ��� через VK ID." };
+      }
+    }
+
+    const ownerId = Number(this.config.ownerId);
+    if (Number.isNaN(ownerId)) {
+      return { error: "������ ownerId ��� VK. ������ ���४�� ID �⥭�." };
+    }
+
+    saveVkTokenFromConfig(this.config);
+    return { ownerId, accessToken: this.config.accessToken };
+  }
+
   async publishPost(post: PostDraft): Promise<PostResult> {
+    const validation = await this.ensureAccessToken();
+    if ("error" in validation) {
+      return {
+        platform: "vk",
+        success: false,
+        error: validation.error,
+      };
+    }
+
+    const { ownerId, accessToken } = validation;
+
     try {
       const url = `${this.API_BASE_URL}/vk/post`;
 
-      const requestBody: {
-        owner_id: number;
-        message: string;
-        from_group?: number;
-      } = {
-        // Fix: Provide a default value in case groupId is not a valid number
-        owner_id: parseInt(this.config.groupId),
+      const requestBody: Record<string, unknown> = {
+        access_token: accessToken,
+        owner_id: ownerId,
         message: post.content,
       };
-
-      // Add optional parameters
-      if (this.config.groupId) {
-        requestBody.from_group = 1;
-      }
 
       const response = await fetch(url, {
         method: "POST",
@@ -66,13 +87,13 @@ export class VKService {
           success: true,
           messageId: data.data?.post_id?.toString(),
         };
-      } else {
-        return {
-          platform: "vk",
-          success: false,
-          error: data.error?.message || "Unknown error",
-        };
       }
+
+      return {
+        platform: "vk",
+        success: false,
+        error: data.error?.message || "VK API ���� �訡��",
+      };
     } catch (error) {
       return {
         platform: "vk",
@@ -83,39 +104,39 @@ export class VKService {
   }
 
   async publishPostWithImages(post: PostDraft): Promise<PostResult> {
+    const validation = await this.ensureAccessToken();
+    if ("error" in validation) {
+      return {
+        platform: "vk",
+        success: false,
+        error: validation.error,
+      };
+    }
+
+    const { ownerId, accessToken } = validation;
+
     try {
       if (!post.images || post.images.length === 0) {
         return this.publishPost(post);
       }
 
-      // First, upload photos to get attachment strings
-      const attachments = await this.uploadPhotos(post.images);
+      const attachments = await this.uploadPhotos(post.images, ownerId, accessToken);
       if (!attachments.success) {
         return {
           platform: "vk",
           success: false,
-          error: attachments.error || "Failed to upload photos",
+          error: attachments.error || "�� 㤠���� ����㧨�� �� � VK",
         };
       }
 
-      // Then create the post with attachments
       const url = `${this.API_BASE_URL}/vk/post`;
 
-      const requestBody: {
-        owner_id: number;
-        message: string;
-        attachments: string;
-        from_group?: number;
-      } = {
-        owner_id: this.config.groupId ? parseInt(this.config.groupId, 10) : 0,
+      const requestBody: Record<string, unknown> = {
+        access_token: accessToken,
+        owner_id: ownerId,
         message: post.content,
-        attachments: attachments.data ? attachments.data.join(",") : "",
+        attachments: attachments.data,
       };
-
-      // Add optional parameters
-      if (this.config.groupId) {
-        requestBody.from_group = 1;
-      }
 
       const response = await fetch(url, {
         method: "POST",
@@ -134,13 +155,13 @@ export class VKService {
           success: true,
           messageId: data.data?.post_id?.toString(),
         };
-      } else {
-        return {
-          platform: "vk",
-          success: false,
-          error: data.error?.message || "Unknown error",
-        };
       }
+
+      return {
+        platform: "vk",
+        success: false,
+        error: data.error?.message || "VK API ���� �訡��",
+      };
     } catch (error) {
       return {
         platform: "vk",
@@ -150,14 +171,19 @@ export class VKService {
     }
   }
 
-  private async uploadPhotos(photos: File[]): Promise<{ success: boolean; data?: string[]; error?: string }> {
+  private async uploadPhotos(
+    photos: File[],
+    ownerId: number,
+    accessToken: string
+  ): Promise<{ success: boolean; data?: string[]; error?: string }> {
     try {
       const attachmentIds: string[] = [];
 
-      // Upload each photo
       for (const photo of photos) {
         const formData = new FormData();
         formData.append("photo", photo, photo.name);
+        formData.append("access_token", accessToken);
+        formData.append("owner_id", ownerId.toString());
 
         const response = await fetch(`${this.API_BASE_URL}/vk/uploadPhoto`, {
           method: "POST",
@@ -169,15 +195,15 @@ export class VKService {
 
         const data = await response.json();
 
-        if (data.success) {
-          if (data.data?.attachment) {
-            attachmentIds.push(data.data.attachment);
-          }
-        } else {
+        if (!data.success) {
           return {
             success: false,
-            error: data.error?.message || "Failed to upload photo",
+            error: data.error?.message || "VK API ���� �訡�� �� ����㧪� ��",
           };
+        }
+
+        if (data.data?.attachment) {
+          attachmentIds.push(data.data.attachment as string);
         }
       }
 

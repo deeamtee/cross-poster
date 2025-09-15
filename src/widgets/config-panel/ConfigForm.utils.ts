@@ -1,5 +1,4 @@
-import type { AppConfig, TelegramConfig, VKConfig, Platform } from "@core/types";
-
+﻿import type { AppConfig, TelegramConfig, VKConfig, Platform } from "@core/types";
 
 export const getPlatformConfig = (
   config: AppConfig,
@@ -12,18 +11,12 @@ export const getPlatformConfig = (
       enabled: platformConfig?.enabled || false,
       config: (platformConfig?.config as TelegramConfig) || { botToken: "", chatId: "" },
     };
-  } else if (platform === "vk") {
-    return {
-      enabled: platformConfig?.enabled || false,
-      config: (platformConfig?.config as VKConfig) || { groupToken: "", groupId: "" },
-    };
-  } else {
-    // For VK ID, use the same config structure as VK but with empty values
-    return {
-      enabled: platformConfig?.enabled || false,
-      config: (platformConfig?.config as VKConfig) || { groupToken: "", groupId: "" },
-    };
   }
+
+  return {
+    enabled: platformConfig?.enabled || false,
+    config: (platformConfig?.config as VKConfig) || { ownerId: "" },
+  };
 };
 
 export const updatePlatformConfigInAppConfig = (

@@ -1,6 +1,7 @@
-import type { AppConfig, PostDraft, PublishResponse, PostResult, TelegramConfig, VKConfig } from '@core/types';
+﻿import type { AppConfig, PostDraft, PublishResponse, PostResult, TelegramConfig, VKConfig } from '@core/types';
 import { TelegramService } from './telegram';
 import { VKService } from './vk';
+import { mergeVkConfigWithStoredToken, saveVkTokenFromConfig } from './vk-token.storage';
 
 export class CrossPosterService {
   private telegramConfig?: TelegramConfig;
@@ -34,9 +35,9 @@ export class CrossPosterService {
   async publishPost(post: PostDraft, config: AppConfig): Promise<PublishResponse> {
     // Update config before publishing
     this.updateConfig(config);
-    
+
     const results: PostResult[] = [];
-    
+
     // Publish to Telegram if configured
     if (this.telegramConfig) {
       const telegramService = new TelegramService(this.telegramConfig);
@@ -48,11 +49,23 @@ export class CrossPosterService {
 
     // Publish to VK if configured
     if (this.vkConfig) {
-      const vkService = new VKService(this.vkConfig);
-      const result = post.images && post.images.length > 0
-        ? await vkService.publishPostWithImages(post)
-        : await vkService.publishPost(post);
-      results.push(result);
+      const mergedVkConfig = mergeVkConfigWithStoredToken(this.vkConfig);
+      Object.assign(this.vkConfig, mergedVkConfig);
+
+      if (!this.vkConfig.accessToken) {
+        results.push({
+          platform: 'vk',
+          success: false,
+          error: 'VK access token is missing. ���ਧ���� �१ VK ID � ����ன���.',
+        });
+      } else {
+        saveVkTokenFromConfig(this.vkConfig);
+        const vkService = new VKService(this.vkConfig);
+        const result = post.images && post.images.length > 0
+          ? await vkService.publishPostWithImages(post)
+          : await vkService.publishPost(post);
+        results.push(result);
+      }
     }
 
     const totalSuccess = results.filter(r => r.success).length;
@@ -68,7 +81,7 @@ export class CrossPosterService {
   getConfiguredPlatforms(): string[] {
     const platforms = [];
     if (this.telegramConfig) platforms.push('telegram');
-    if (this.vkConfig) platforms.push('vk');
+    if (this.vkConfig?.accessToken) platforms.push('vk');
     return platforms;
   }
 }

@@ -1,10 +1,23 @@
-import type { AppConfig, Platform, PlatformConfig, TelegramConfig, VKConfig } from "@core/types";
+﻿import type { AppConfig, Platform, PlatformConfig, TelegramConfig, VKConfig } from "@core/types";
 
 /**
  * Get configured platforms from app config
  */
 export function getConfiguredPlatforms(config: AppConfig): Platform[] {
-  return config.platforms.filter((platform) => platform.enabled).map((platform) => platform.platform);
+  return config.platforms
+    .filter((platform) => {
+      if (!platform.enabled) {
+        return false;
+      }
+
+      if (platform.platform === "vk") {
+        const vkConfig = platform.config as VKConfig;
+        return Boolean(vkConfig.accessToken && vkConfig.ownerId);
+      }
+
+      return true;
+    })
+    .map((platform) => platform.platform);
 }
 
 /**
@@ -51,13 +64,12 @@ export function validatePlatformConfig(platformConfig: PlatformConfig): string[]
     }
     case "vk": {
       const vkConfig = platformConfig.config as VKConfig;
-      if (!vkConfig.groupId) {
-        errors.push("Group ID is required for VK");
+      if (!vkConfig.ownerId) {
+        errors.push("Owner ID is required for VK");
       }
-      if (!vkConfig.groupToken) {
-        errors.push("Group Token is required for VK");
+      if (!vkConfig.accessToken) {
+        errors.push("VK access token is required. Authorize via VK ID.");
       }
-
       break;
     }
   }

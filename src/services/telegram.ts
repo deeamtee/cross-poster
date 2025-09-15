@@ -1,4 +1,4 @@
-import type { PostDraft, PostResult, TelegramConfig } from "@/core/types";
+﻿import type { PostDraft, PostResult, TelegramConfig } from "@/core/types";
 
 export class TelegramService {
   private config: TelegramConfig;
@@ -145,7 +145,7 @@ console.log(formData);
       formData.append('chat_id', this.config.chatId);
       
       // Create media array with attachment references
-      const media = photos.map((photo, index) => ({
+      const media = photos.map((_, index) => ({
         type: 'photo',
         media: `attach://photo${index}`,
         caption: index === 0 ? caption : undefined,

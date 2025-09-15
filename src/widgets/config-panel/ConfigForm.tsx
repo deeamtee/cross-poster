@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import type { AppConfig, TelegramConfig, VKConfig, Platform } from "@core/types";
 import { TelegramConfigCard } from "./TelegramConfigCard";
 import { VKConfigCard } from "./VKConfigCard";
-import { VKIDConfigCard } from "./VKIDConfigCard";
 import { getPlatformConfig, updatePlatformConfigInAppConfig } from "./ConfigForm.utils";
 
 interface ConfigFormProps {
@@ -22,7 +21,7 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({ config, onConfigChange, 
         if (isDifferent) {
           onConfigChange(formData);
         }
-      }, 1000); // 1 second debounce
+      }, 1000);
 
       return () => clearTimeout(timeoutId);
     }
@@ -35,7 +34,6 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({ config, onConfigChange, 
 
   const telegramConfig = getPlatformConfig(formData, "telegram");
   const vkConfig = getPlatformConfig(formData, "vk");
-  const vkidConfig = getPlatformConfig(formData, "vkid");
 
   const handleSave = () => {
     onConfigChange(formData);
@@ -46,7 +44,6 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({ config, onConfigChange, 
 
   return (
     <div className="space-y-8">
-      {/* Telegram Configuration */}
       <TelegramConfigCard
         enabled={telegramConfig.enabled}
         config={telegramConfig.config as TelegramConfig}
@@ -54,7 +51,6 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({ config, onConfigChange, 
         onConfigChange={(config) => updatePlatformConfig("telegram", true, config)}
       />
 
-      {/* VK Configuration */}
       <VKConfigCard
         enabled={vkConfig.enabled}
         config={vkConfig.config as VKConfig}
@@ -62,13 +58,6 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({ config, onConfigChange, 
         onConfigChange={(config) => updatePlatformConfig("vk", true, config)}
       />
 
-      {/* VK ID Configuration */}
-      <VKIDConfigCard
-        enabled={vkidConfig.enabled}
-        onToggle={(enabled) => updatePlatformConfig("vkid", enabled, vkidConfig.config as VKConfig)}
-      />
-
-      {/* Action Buttons */}
       {showActions && (
         <div className="flex justify-end space-x-3 pt-4">
           <button

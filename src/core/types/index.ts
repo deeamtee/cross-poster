@@ -1,11 +1,11 @@
-// Post types
+﻿// Post types
 export interface PostDraft {
   content: string;
   images?: File[];
 }
 
 // Platform types
-export type Platform = 'telegram' | 'vk' | 'vkid';
+export type Platform = 'telegram' | 'vk';
 
 export interface PlatformConfig {
   platform: Platform;
@@ -19,10 +19,14 @@ export interface TelegramConfig {
 }
 
 export interface VKConfig {
-  groupToken: string; // Group token for VK API
-  groupId: string;     // Group ID for VK API
+  ownerId: string; // Wall identifier (negative for communities)
+  accessToken?: string; // VK access token obtained via VK ID
+  accessTokenExpiresAt?: string; // ISO string with token expiration time
+  userId?: string; // VK user ID associated with the token
+  refreshToken?: string; // Optional refresh token from VK ID
+  scope?: string; // OAuth scope
+  deviceId?: string; // Device identifier returned by VK ID (required for refresh)
 }
-
 // Application state
 export interface AppConfig {
   platforms: PlatformConfig[];
