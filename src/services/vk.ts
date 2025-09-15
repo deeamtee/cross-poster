@@ -2,26 +2,30 @@ import type { PostDraft, PostResult, VKConfig } from "@/core/types";
 
 export class VKService {
   private config: VKConfig;
-  private readonly API_BASE_URL = 'http://localhost:3000/api';
-  private readonly API_KEY = 'secret-api-key';
+  private readonly API_BASE_URL = "http://localhost:3000/api";
+  private readonly API_KEY = "secret-api-key";
 
   constructor(config: VKConfig) {
     this.config = config;
   }
 
   // Health check endpoint
-  async healthCheck(): Promise<{ success: boolean; data?: { status: string; timestamp: string; uptime: number }; error?: string }> {
+  async healthCheck(): Promise<{
+    success: boolean;
+    data?: { status: string; timestamp: string; uptime: number };
+    error?: string;
+  }> {
     try {
       const response = await fetch(`${this.API_BASE_URL}/health`, {
-        method: 'GET',
+        method: "GET",
       });
 
       const data = await response.json();
       return { success: true, data };
     } catch (error) {
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Health check failed' 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Health check failed",
       };
     }
   }
@@ -29,12 +33,13 @@ export class VKService {
   async publishPost(post: PostDraft): Promise<PostResult> {
     try {
       const url = `${this.API_BASE_URL}/vk/post`;
-      
+
       const requestBody: {
         owner_id: number;
         message: string;
         from_group?: number;
       } = {
+        // Fix: Provide a default value in case groupId is not a valid number
         owner_id: parseInt(this.config.groupId),
         message: post.content,
       };
@@ -45,10 +50,10 @@ export class VKService {
       }
 
       const response = await fetch(url, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': this.API_KEY,
+          "Content-Type": "application/json",
+          "x-api-key": this.API_KEY,
         },
         body: JSON.stringify(requestBody),
       });
@@ -57,22 +62,22 @@ export class VKService {
 
       if (data.success) {
         return {
-          platform: 'vk',
+          platform: "vk",
           success: true,
           messageId: data.data?.post_id?.toString(),
         };
       } else {
         return {
-          platform: 'vk',
+          platform: "vk",
           success: false,
-          error: data.error?.message || 'Unknown error',
+          error: data.error?.message || "Unknown error",
         };
       }
     } catch (error) {
       return {
-        platform: 'vk',
+        platform: "vk",
         success: false,
-        error: error instanceof Error ? error.message : 'Network error',
+        error: error instanceof Error ? error.message : "Network error",
       };
     }
   }
@@ -87,24 +92,24 @@ export class VKService {
       const attachments = await this.uploadPhotos(post.images);
       if (!attachments.success) {
         return {
-          platform: 'vk',
+          platform: "vk",
           success: false,
-          error: attachments.error || 'Failed to upload photos',
+          error: attachments.error || "Failed to upload photos",
         };
       }
 
       // Then create the post with attachments
       const url = `${this.API_BASE_URL}/vk/post`;
-      
+
       const requestBody: {
         owner_id: number;
         message: string;
         attachments: string;
         from_group?: number;
       } = {
-        owner_id: parseInt(this.config.groupId),
+        owner_id: this.config.groupId ? parseInt(this.config.groupId, 10) : 0,
         message: post.content,
-        attachments: attachments.data?.join(','),
+        attachments: attachments.data ? attachments.data.join(",") : "",
       };
 
       // Add optional parameters
@@ -113,10 +118,10 @@ export class VKService {
       }
 
       const response = await fetch(url, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': this.API_KEY,
+          "Content-Type": "application/json",
+          "x-api-key": this.API_KEY,
         },
         body: JSON.stringify(requestBody),
       });
@@ -125,22 +130,22 @@ export class VKService {
 
       if (data.success) {
         return {
-          platform: 'vk',
+          platform: "vk",
           success: true,
           messageId: data.data?.post_id?.toString(),
         };
       } else {
         return {
-          platform: 'vk',
+          platform: "vk",
           success: false,
-          error: data.error?.message || 'Unknown error',
+          error: data.error?.message || "Unknown error",
         };
       }
     } catch (error) {
       return {
-        platform: 'vk',
+        platform: "vk",
         success: false,
-        error: error instanceof Error ? error.message : 'Network error',
+        error: error instanceof Error ? error.message : "Network error",
       };
     }
   }
@@ -148,16 +153,16 @@ export class VKService {
   private async uploadPhotos(photos: File[]): Promise<{ success: boolean; data?: string[]; error?: string }> {
     try {
       const attachmentIds: string[] = [];
-      
+
       // Upload each photo
       for (const photo of photos) {
         const formData = new FormData();
-        formData.append('photo', photo, photo.name);
+        formData.append("photo", photo, photo.name);
 
         const response = await fetch(`${this.API_BASE_URL}/vk/uploadPhoto`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'x-api-key': this.API_KEY,
+            "x-api-key": this.API_KEY,
           },
           body: formData,
         });
@@ -165,11 +170,13 @@ export class VKService {
         const data = await response.json();
 
         if (data.success) {
-          attachmentIds.push(data.data?.attachment);
+          if (data.data?.attachment) {
+            attachmentIds.push(data.data.attachment);
+          }
         } else {
           return {
             success: false,
-            error: data.error?.message || 'Failed to upload photo',
+            error: data.error?.message || "Failed to upload photo",
           };
         }
       }
@@ -181,7 +188,7 @@ export class VKService {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Network error',
+        error: error instanceof Error ? error.message : "Network error",
       };
     }
   }

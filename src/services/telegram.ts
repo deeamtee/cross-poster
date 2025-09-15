@@ -94,20 +94,22 @@ export class TelegramService {
     try {
       const url = `${this.API_BASE_URL}/telegram/sendPhoto`;
 
-      const requestBody = {
-        chat_id: this.config.chatId,
-        photo: URL.createObjectURL(photo), // In a real implementation, this would be uploaded to a server and return a URL
-        caption: caption,
-        parse_mode: 'HTML'
-      };
+      // Create FormData for proper file upload
+      const formData = new FormData();
+      formData.append('chat_id', this.config.chatId);
+      formData.append('photo', photo);
+      if (caption) {
+        formData.append('caption', caption);
+      }
+      formData.append('parse_mode', 'HTML');
+console.log(formData);
 
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'x-api-key': this.API_KEY,
         },
-        body: JSON.stringify(requestBody),
+        body: formData,
       });
 
       const data = await response.json();
@@ -138,26 +140,31 @@ export class TelegramService {
     try {
       const url = `${this.API_BASE_URL}/telegram/sendMediaGroup`;
 
-      // Create media array
+      // Create FormData for proper file upload
+      const formData = new FormData();
+      formData.append('chat_id', this.config.chatId);
+      
+      // Create media array with attachment references
       const media = photos.map((photo, index) => ({
         type: 'photo',
-        media: URL.createObjectURL(photo), // In a real implementation, this would be uploaded to a server and return a URL
+        media: `attach://photo${index}`,
         caption: index === 0 ? caption : undefined,
         parse_mode: index === 0 ? 'HTML' : undefined
       }));
-
-      const requestBody = {
-        chat_id: this.config.chatId,
-        media: media
-      };
+      
+      formData.append('media', JSON.stringify(media));
+      
+      // Append each photo with its corresponding name
+      photos.forEach((photo, index) => {
+        formData.append(`photo${index}`, photo);
+      });
 
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'x-api-key': this.API_KEY,
         },
-        body: JSON.stringify(requestBody),
+        body: formData,
       });
 
       const data = await response.json();

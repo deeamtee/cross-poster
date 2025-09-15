@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LoginForm } from '@/modules/auth/components/LoginForm';
 
-export const AuthPage: React.FC = () => {
+export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSwitchToSignUp = () => {

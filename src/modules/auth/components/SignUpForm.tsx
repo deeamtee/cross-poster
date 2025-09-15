@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
-import { Button } from '@core/ui/button';
-import { Input } from '@core/ui/input';
-import { Spinner } from '@core/ui/spinner';
+import { useNavigate } from 'react-router-dom';
+import { Button, Input, Spinner } from '@core/ui';
 import type { AuthCredentials } from '@core/types';
 import { useAuth } from '..';
 
 interface SignUpFormProps {
-  onSwitchToSignIn: () => void;
+  onSwitchToLogin: () => void;
 }
 
-export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
+export const SignUpForm = ({ onSwitchToLogin }: SignUpFormProps) => {
   const [credentials, setCredentials] = useState<AuthCredentials>({ email: '', password: '' });
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
+  const navigate = useNavigate();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +40,9 @@ export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
       const result = await signUp(credentials);
       if (result.error) {
         setError(result.error.message);
+      } else {
+        // Redirect to main page after successful registration
+        navigate('/');
       }
     } catch (err) {
       console.error('Sign up error:', err);
@@ -120,18 +123,21 @@ export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            className="w-full"
+            variant="primary"
           >
             {loading ? <Spinner /> : 'Зарегистрироваться'}
           </Button>
         </form>
         
         <div className="mt-6 text-center">
-          <div className="text-gray-600 text-sm">
-            Уже есть аккаунт?{' '}
+          <div className="text-gray-600 text-sm flex items-center justify-center gap-1">
+            <span>Уже есть аккаунт?</span>
             <Button
-              onClick={onSwitchToSignIn}
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              onClick={onSwitchToLogin}
+              variant="secondary"
+              size="sm"
+              className="font-medium"
             >
               Войти
             </Button>

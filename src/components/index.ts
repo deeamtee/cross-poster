@@ -1,0 +1,1 @@
+export { RedirectIfAuthenticated } from './RedirectIfAuthenticated';

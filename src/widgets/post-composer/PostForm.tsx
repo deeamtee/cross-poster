@@ -30,10 +30,10 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
 
   const handleSubmit = useCallback((e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!content.trim()) return;
+    if (!content.trim() && images.length === 0) return;
 
     onSubmit({
-      content: content.trim(),
+      content: content.trim() || '', // Send empty string if no content
       images: images.length > 0 ? images : undefined,
     });
   }, [content, images, onSubmit]);
@@ -111,7 +111,7 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
     setImages([]);
   }, [imageUrls]);
 
-  const canPublish = content.trim() && configuredPlatforms.length > 0;
+  const canPublish = (content.trim() || images.length > 0) && configuredPlatforms.length > 0;
 
   const formatFileSize = useCallback((bytes: number): string => {
     if (bytes === 0) return '0 Bytes';

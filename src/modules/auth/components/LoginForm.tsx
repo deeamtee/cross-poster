@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@core/ui/button';
 import { Input } from '@core/ui/input';
 import { Spinner } from '@core/ui/spinner';
@@ -15,6 +16,7 @@ export const LoginForm = ({ onSwitchToSignUp, onSwitchToPasswordReset }: LoginFo
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
+  const navigate = useNavigate();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +27,9 @@ export const LoginForm = ({ onSwitchToSignUp, onSwitchToPasswordReset }: LoginFo
       const result = await signIn(credentials);
       if (result.error) {
         setError(result.error.message);
+      } else {
+        // Redirect to main page after successful login
+        navigate('/');
       }
     } catch (err) {
       console.error('Login error:', err);
@@ -84,25 +89,29 @@ export const LoginForm = ({ onSwitchToSignUp, onSwitchToPasswordReset }: LoginFo
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            className="w-full"
+            variant="primary"
           >
             {loading ? <Spinner /> : 'Войти'}
           </Button>
         </form>
         
-        <div className="mt-6 text-center space-y-2">
+        <div className="mt-6 text-center space-y-4">
           <Button
             onClick={onSwitchToPasswordReset}
-            className="text-blue-600 hover:text-blue-700 text-sm"
+            variant="secondary"
+            className="text-sm"
           >
             Забыли пароль?
           </Button>
           
-          <div className="text-gray-600 text-sm">
-            Нет аккаунта?{' '}
+          <div className="text-gray-600 text-sm flex items-center justify-center gap-1">
+            <span>Нет аккаунта?</span>
             <Button
               onClick={onSwitchToSignUp}
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              variant="secondary"
+              size="sm"
+              className="font-medium"
             >
               Зарегистрироваться
             </Button>
