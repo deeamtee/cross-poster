@@ -129,19 +129,19 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
 
   const tokenStatus = useMemo(() => {
     if (!config.accessToken) {
-      return "????? ?? ?????";
+      return "Токен не найден";
     }
 
     if (!config.accessTokenExpiresAt) {
-      return "????? ????? (??? ??? ??????)";
+      return "Токен активен (без даты истечения)";
     }
 
     const expiresAt = new Date(config.accessTokenExpiresAt);
     if (Number.isNaN(expiresAt.getTime())) {
-      return "????? ?????";
+      return "Токен истёк";
     }
 
-    return `????? ?????? ${expiresAt.toLocaleString()}`;
+    return `Токен истечёт ${expiresAt.toLocaleString()}`;
   }, [config.accessToken, config.accessTokenExpiresAt]);
 
   const handleOwnerIdChange = (value: string) => {
@@ -172,14 +172,14 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900">VK</h3>
-            <p className="text-sm text-gray-500">?????? ?????? ? VK ?? VK ID</p>
+            <p className="text-sm text-gray-500">Настройка доступа к VK через VK ID</p>
           </div>
         </div>
       }
     >
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">??????? VK</span>
+          <span className="text-sm font-medium text-gray-700">Включить VK</span>
           <label htmlFor="vk-enabled" className="relative inline-block w-12 h-6 cursor-pointer">
             <input
               type="checkbox"
@@ -196,12 +196,12 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
           <div className="space-y-4">
             <div>
               <label htmlFor="vk-owner-id" className="block text-sm font-medium text-gray-700 mb-2">
-                Owner ID (????????? ??? ???? ??? ??????? ??? ?????)
+                Owner ID (отрицательное значение для группы, положительное для профиля)
               </label>
               <input
                 id="vk-owner-id"
                 type="text"
-                placeholder="??????, -123456789"
+                placeholder="Например, -123456789"
                 value={config.ownerId}
                 onChange={(e) => handleOwnerIdChange(e.target.value)}
                 className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
@@ -210,32 +210,32 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
 
             <div className="p-3 bg-blue-50 rounded-lg space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-blue-700 font-medium">????? ????</p>
+                <p className="text-sm text-blue-700 font-medium">Статус токена</p>
                 {config.accessToken && (
                   <button
                     type="button"
                     onClick={handleClearToken}
                     className="text-xs text-blue-600 hover:text-blue-800"
                   >
-                    ?????? ???
+                    Очистить токен
                   </button>
                 )}
               </div>
               <p className="text-xs text-blue-700 leading-relaxed">{tokenStatus}</p>
               {config.userId && (
-                <p className="text-xs text-blue-700">?????????? ????????: {config.userId}</p>
+                <p className="text-xs text-blue-700">Идентификатор пользователя: {config.userId}</p>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                ??????? ?? VK ID
+                Авторизация через VK ID
               </label>
               <div className="border rounded-lg p-4 bg-gray-50">
                 <div id="vkid-one-tap-container" ref={containerRef} />
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                ??? ???? ?????? ??? ??????? ??????? ? ???????? ? ??? ??????? ??? ??????.
+                Этот блок позволяет получить токен автоматически и синхронизировать его с настройками.
               </p>
             </div>
           </div>

@@ -28,7 +28,7 @@ export class VKService {
     this.syncConfigWithStorage();
 
     if (!this.config.accessToken) {
-      return { error: "VK access token is missing. ???????? ?? VK ID." };
+      return { error: "VK access token is missing. Авторизуйтесь через VK ID." };
     }
 
     if (isVkTokenExpired(this.config)) {
@@ -36,13 +36,13 @@ export class VKService {
       if (refreshed?.accessToken) {
         Object.assign(this.config, refreshed);
       } else {
-        return { error: "VK access token ????. ?????? ??????? через VK ID." };
+        return { error: "VK access token истёк. Обновите авторизацию через VK ID." };
       }
     }
 
     const ownerId = Number(this.config.ownerId);
     if (Number.isNaN(ownerId)) {
-      return { error: "?????? ownerId ??? VK. ?????? ?????? ID ???." };
+      return { error: "Некорректный ownerId для VK. Укажите корректный ID владельца." };
     }
 
     saveVkTokenFromConfig(this.config);
@@ -92,7 +92,7 @@ export class VKService {
       return {
         platform: "vk",
         success: false,
-        error: data.error?.message || "VK API ???? ????",
+        error: data.error?.message || "VK API вернул ошибку",
       };
     } catch (error) {
       return {
@@ -125,7 +125,7 @@ export class VKService {
         return {
           platform: "vk",
           success: false,
-          error: attachments.error || "?? ????? ??????? ?? ? VK",
+          error: attachments.error || "Не удалось загрузить фото в VK",
         };
       }
 
@@ -160,7 +160,7 @@ export class VKService {
       return {
         platform: "vk",
         success: false,
-        error: data.error?.message || "VK API ???? ????",
+        error: data.error?.message || "VK API вернул ошибку",
       };
     } catch (error) {
       return {
@@ -198,7 +198,7 @@ export class VKService {
         if (!data.success) {
           return {
             success: false,
-            error: data.error?.message || "VK API ???? ???? ?? ?????? ??",
+            error: data.error?.message || "VK API вернул ошибку при загрузке фото",
           };
         }
 
