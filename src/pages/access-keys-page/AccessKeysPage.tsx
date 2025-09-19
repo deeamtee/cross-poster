@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { ConfigPanel } from '@/widgets/config-panel';
 import type { AppConfig } from '@types';
 
 interface AccessKeysPageProps {
   config: AppConfig;
-  onConfigChange: (config: AppConfig) => void;
+  onConfigChange: (config: AppConfig) => Promise<void> | void;
+  isSaving?: boolean;
 }
 
-export const AccessKeysPage: React.FC<AccessKeysPageProps> = ({ 
-  config, 
-  onConfigChange 
+export const AccessKeysPage: React.FC<AccessKeysPageProps> = ({
+  config,
+  onConfigChange,
+  isSaving = false,
 }) => {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
@@ -26,13 +28,15 @@ export const AccessKeysPage: React.FC<AccessKeysPageProps> = ({
     }
   };
 
+  const saving = isAutoSaving || isSaving;
+
   return (
     <div>
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-2xl font-bold text-gray-900">Ключи доступа</h1>
           <div className="flex items-center space-x-2">
-            {isAutoSaving && (
+            {saving && (
               <div className="flex items-center text-sm text-blue-600">
                 <svg className="animate-spin h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -41,18 +45,18 @@ export const AccessKeysPage: React.FC<AccessKeysPageProps> = ({
                 Сохранение...
               </div>
             )}
-            {lastSaved && !isAutoSaving && (
+            {lastSaved && !saving && (
               <div className="text-sm text-green-600">
-                ✓ Сохранено {lastSaved.toLocaleTimeString()}
+                Последнее сохранение в {lastSaved.toLocaleTimeString()}
               </div>
             )}
           </div>
         </div>
         <p className="text-gray-600">
-          Настройте ключи доступа для публикации контента на различных платформах. Изменения сохраняются автоматически.
+          Управляйте доступом к платформам и обновляйте ключи здесь. Изменения сохраняются автоматически.
         </p>
       </div>
-      
+
       <ConfigPanel
         config={config}
         onConfigChange={handleConfigChange}

@@ -1,10 +1,10 @@
-import React from 'react';
+﻿import React from 'react';
 import { ConfigForm } from './ConfigForm';
 import type { AppConfig } from '@types';
 
 interface ConfigPanelProps {
   config: AppConfig;
-  onConfigChange: (config: AppConfig) => void;
+  onConfigChange: (config: AppConfig) => Promise<void> | void;
   showActions?: boolean;
 }
 
@@ -21,3 +21,4 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
     />
   );
 };
+

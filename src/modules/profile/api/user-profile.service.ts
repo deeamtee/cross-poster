@@ -1,6 +1,4 @@
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { getAuth } from 'firebase/auth';
-import type { User } from '@types';
+﻿import type { User } from '@types';
 import { authService } from '@modules/auth';
 
 /**
@@ -8,36 +6,25 @@ import { authService } from '@modules/auth';
  */
 export const userProfileService = {
   /**
-   * Upload a profile photo to Firebase Storage
+   * Convert a profile photo to a data URL for temporary storage before uploading to backend
    * @param file The image file to upload
-   * @returns The download URL of the uploaded image
+   * @returns A data URL representing the uploaded image
    */
   async uploadProfilePhoto(file: File): Promise<string> {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    
-    if (!user) {
-      throw new Error('User not authenticated');
-    }
-    
-    // Initialize Firebase Storage
-    const storage = getStorage();
-    
-    // Create a reference to the profile photos folder with the user's ID
-    const profilePhotosRef = ref(storage, `profile-photos/${user.uid}`);
-    
-    try {
-      // Upload the file
-      const snapshot = await uploadBytes(profilePhotosRef, file);
-      
-      // Get the download URL
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      
-      return downloadURL;
-    } catch (error) {
-      console.error('Error uploading profile photo:', error);
-      throw new Error('Failed to upload profile photo');
-    }
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          resolve(reader.result);
+        } else {
+          reject(new Error('Unsupported file format'));
+        }
+      };
+      reader.onerror = () => {
+        reject(new Error('Failed to read profile photo'));
+      };
+      reader.readAsDataURL(file);
+    });
   },
   
   /**

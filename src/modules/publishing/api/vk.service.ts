@@ -1,15 +1,15 @@
-import type { PostDraft, PostResult, VKConfig } from "@types";
+﻿import type { PostDraft, PostResult, VKConfig } from "@types";
 import {
   mergeVkConfigWithStoredToken,
   saveVkTokenFromConfig,
   isVkTokenExpired,
   refreshVkToken,
 } from '../lib';
+import { authService } from '@modules/auth';
 
 export class VKService {
   private config: VKConfig;
-  private readonly API_BASE_URL = "http://localhost:3000/api";
-  private readonly API_KEY = "secret-api-key";
+  private readonly API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000/api";
 
   constructor(config: VKConfig) {
     this.config = { ...config };
@@ -24,11 +24,28 @@ export class VKService {
     }
   }
 
+  private getAuthHeaders(options?: { json?: boolean }): HeadersInit {
+    const token = authService.getAccessToken();
+    if (!token) {
+      throw new Error('Authentication token missing');
+    }
+
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    if (options?.json !== false) {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    return headers;
+  }
+
   private async ensureAccessToken(): Promise<{ ownerId: number; accessToken: string } | { error: string }> {
     this.syncConfigWithStorage();
 
     if (!this.config.accessToken) {
-      return { error: "VK access token is missing. Авторизуйтесь через VK ID." };
+      return { error: 'VK access token is missing. Please authenticate via VK ID.' };
     }
 
     if (isVkTokenExpired(this.config)) {
@@ -36,13 +53,13 @@ export class VKService {
       if (refreshed?.accessToken) {
         Object.assign(this.config, refreshed);
       } else {
-        return { error: "VK access token истёк. Обновите авторизацию через VK ID." };
+        return { error: 'VK access token has expired. Please reauthenticate via VK ID.' };
       }
     }
 
     const ownerId = Number(this.config.ownerId);
     if (Number.isNaN(ownerId)) {
-      return { error: "Некорректный ownerId для VK. Укажите корректный ID владельца." };
+      return { error: 'Invalid ownerId for VK. Please provide a valid group or user ID.' };
     }
 
     saveVkTokenFromConfig(this.config);
@@ -51,7 +68,7 @@ export class VKService {
 
   async publishPost(post: PostDraft): Promise<PostResult> {
     const validation = await this.ensureAccessToken();
-    if ("error" in validation) {
+    if ('error' in validation) {
       return {
         platform: "vk",
         success: false,
@@ -72,10 +89,7 @@ export class VKService {
 
       const response = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": this.API_KEY,
-        },
+        headers: this.getAuthHeaders(),
         body: JSON.stringify(requestBody),
       });
 
@@ -92,7 +106,7 @@ export class VKService {
       return {
         platform: "vk",
         success: false,
-        error: data.error?.message || "VK API вернул ошибку",
+        error: data.error?.message || "VK API returned an error",
       };
     } catch (error) {
       return {
@@ -105,7 +119,7 @@ export class VKService {
 
   async publishPostWithImages(post: PostDraft): Promise<PostResult> {
     const validation = await this.ensureAccessToken();
-    if ("error" in validation) {
+    if ('error' in validation) {
       return {
         platform: "vk",
         success: false,
@@ -125,7 +139,7 @@ export class VKService {
         return {
           platform: "vk",
           success: false,
-          error: attachments.error || "Не удалось загрузить фото в VK",
+          error: attachments.error || "Failed to upload images to VK",
         };
       }
 
@@ -140,10 +154,7 @@ export class VKService {
 
       const response = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": this.API_KEY,
-        },
+        headers: this.getAuthHeaders(),
         body: JSON.stringify(requestBody),
       });
 
@@ -160,7 +171,7 @@ export class VKService {
       return {
         platform: "vk",
         success: false,
-        error: data.error?.message || "VK API вернул ошибку",
+        error: data.error?.message || "VK API returned an error",
       };
     } catch (error) {
       return {
@@ -187,9 +198,7 @@ export class VKService {
 
         const response = await fetch(`${this.API_BASE_URL}/vk/uploadPhoto`, {
           method: "POST",
-          headers: {
-            "x-api-key": this.API_KEY,
-          },
+          headers: this.getAuthHeaders({ json: false }),
           body: formData,
         });
 
@@ -198,7 +207,7 @@ export class VKService {
         if (!data.success) {
           return {
             success: false,
-            error: data.error?.message || "VK API вернул ошибку при загрузке фото",
+            error: data.error?.message || "VK API returned an error during photo upload",
           };
         }
 

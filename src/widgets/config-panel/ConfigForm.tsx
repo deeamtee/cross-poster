@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import type { AppConfig, TelegramConfig, VKConfig, Platform } from "@types";
 import { TelegramConfigCard } from "./TelegramConfigCard";
 import { VKConfigCard } from "./VKConfigCard";
@@ -6,13 +6,17 @@ import { getPlatformConfig, updatePlatformConfigInAppConfig } from "./ConfigForm
 
 interface ConfigFormProps {
   config: AppConfig;
-  onConfigChange: (config: AppConfig) => void;
+  onConfigChange: (config: AppConfig) => Promise<void> | void;
   showActions?: boolean;
   onClose?: () => void;
 }
 
 export const ConfigForm: React.FC<ConfigFormProps> = ({ config, onConfigChange, showActions = true, onClose }) => {
   const [formData, setFormData] = useState<AppConfig>(config);
+
+  useEffect(() => {
+    setFormData(config);
+  }, [config]);
 
   useEffect(() => {
     if (!showActions) {
@@ -71,3 +75,4 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({ config, onConfigChange, 
     </div>
   );
 };
+
