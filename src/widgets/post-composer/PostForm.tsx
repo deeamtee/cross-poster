@@ -44,13 +44,13 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
     const validFiles = Array.from(files).filter(file => {
       // Check if file is an image
       if (!file.type.startsWith('image/')) {
-        alert(`Р¤Р°Р№Р» "${file.name}" РЅРµ СЏРІР»СЏРµС‚СЃСЏ РёР·РѕР±СЂР°Р¶РµРЅРёРµРј.`);
+        alert(`Файл "${file.name}" не является изображением.`);
         return false;
       }
       
       // Check file size (max 20MB for Telegram)
       if (file.size > 20 * 1024 * 1024) {
-        alert(`Р¤Р°Р№Р» "${file.name}" СЃР»РёС€РєРѕРј Р±РѕР»СЊС€РѕР№. РњР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ: 20MB.`);
+        alert(`Файл "${file.name}" слишком большой. Максимальный размер: 20MB.`);
         return false;
       }
       
@@ -125,21 +125,21 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
     <div className="max-w-6xl mx-auto">
       {/* Header Section */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРЅС‚Р°</h1>
-        <p className="text-gray-600">РџСѓР±Р»РёРєР°С†РёСЏ РїРѕСЃС‚РѕРІ РІ СЃРѕС†РёР°Р»СЊРЅС‹Рµ СЃРµС‚Рё</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Создание контента</h1>
+        <p className="text-gray-600">Публикация постов в социальные сети</p>
       </div>
 
       {/* Content Type Selector */}
       <div className="mb-8">
         <div className="flex items-center space-x-4">
           <button className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium shadow-sm hover:bg-blue-700 transition-all duration-200">
-            рџ“ќ РћР±С‹С‡РЅС‹Р№ РїРѕСЃС‚
+            📝 Обычный пост
           </button>
           <button className="px-6 py-3 bg-gray-100 text-gray-600 rounded-xl font-medium hover:bg-gray-200 transition-all duration-200 opacity-60 cursor-not-allowed">
-            рџЋ¬ Shorts (СЃРєРѕСЂРѕ)
+            🎬 Shorts (скоро)
           </button>
           <button className="px-6 py-3 bg-gray-100 text-gray-600 rounded-xl font-medium hover:bg-gray-200 transition-all duration-200 opacity-60 cursor-not-allowed">
-            рџ“Љ РћРїСЂРѕСЃС‹ (СЃРєРѕСЂРѕ)
+            📊 Опросы (скоро)
           </button>
         </div>
       </div>
@@ -151,9 +151,9 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <span className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                вњЏпёЏ
+                ✏️
               </span>
-              РўРµРєСЃС‚ РїРѕСЃС‚Р°
+              Текст поста
             </h3>
             
             <form onSubmit={handleSubmit}>
@@ -161,14 +161,14 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
                 id="post-content"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="Рћ С‡С‘Рј С…РѕС‚РёС‚Рµ СЂР°СЃСЃРєР°Р·Р°С‚СЊ?"
+                placeholder="О чём хотите рассказать?"
                 rows={6}
                 disabled={isPublishing}
                 className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none text-lg"
               />
               <div className="flex justify-end items-center mt-3">
                 <div className="text-sm text-gray-500">
-                  {content.length}/4096 СЃРёРјРІРѕР»РѕРІ
+                  {content.length}/4096 символов
                 </div>
               </div>
               
@@ -181,9 +181,9 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <span className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                рџ–јпёЏ
+                🖼️
               </span>
-              РР·РѕР±СЂР°Р¶РµРЅРёСЏ
+              Изображения
             </h3>
             
             {/* Hidden File Input */}
@@ -217,10 +217,10 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
                 </div>
                 <div>
                   <p className="text-lg font-medium text-gray-700">
-                    РџРµСЂРµС‚Р°С‰РёС‚Рµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РёР»Рё РЅР°Р¶РјРёС‚Рµ РґР»СЏ РІС‹Р±РѕСЂР°
+                    Перетащите изображения или нажмите для выбора
                   </p>
                   <p className="text-sm text-gray-500 mt-2">
-                    PNG, JPG, GIF РґРѕ 20MB вЂў РџРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ РјРЅРѕР¶РµСЃС‚РІРµРЅРЅС‹Р№ РІС‹Р±РѕСЂ
+                    PNG, JPG, GIF до 20MB • Поддерживается множественный выбор
                   </p>
                 </div>
               </div>
@@ -231,15 +231,15 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
               <div className="mt-6">
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="font-medium text-gray-700 flex items-center">
-                    <span className="mr-2">рџ“Ћ</span>
-                    РџСЂРёРєСЂРµРїР»С‘РЅРЅС‹Рµ С„Р°Р№Р»С‹ ({images.length})
+                    <span className="mr-2">📎</span>
+                    Прикреплённые файлы ({images.length})
                   </h4>
                   <button
                     onClick={clearForm}
                     disabled={isPublishing}
                     className="text-sm text-red-600 hover:text-red-700 disabled:opacity-50"
                   >
-                    РћС‡РёСЃС‚РёС‚СЊ РІСЃС‘
+                    Очистить всё
                   </button>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -266,9 +266,9 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <span className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                рџЊђ
+                🌐
               </span>
-              РџР»Р°С‚С„РѕСЂРјС‹
+              Платформы
             </h3>
             
             {configuredPlatforms.length > 0 ? (
@@ -284,7 +284,7 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
                       <span className="font-medium text-green-800">{getPlatformDisplayName(platform)}</span>
                     </div>
                     <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                      Р“РѕС‚РѕРІ
+                      Готов
                     </span>
                   </div>
                 ))}
@@ -292,19 +292,19 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
             ) : (
               <div className="text-center py-6">
                 <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  вљ пёЏ
+                  ⚠️
                 </div>
                 <p className="text-red-600 font-medium mb-2">
-                  РќРµС‚ РЅР°СЃС‚СЂРѕРµРЅРЅС‹С… РїР»Р°С‚С„РѕСЂРј
+                  Нет настроенных платформ
                 </p>
                 <p className="text-sm text-gray-500 mb-4">
-                  РќР°СЃС‚СЂРѕР№С‚Рµ С…РѕС‚СЏ Р±С‹ РѕРґРЅСѓ РїР»Р°С‚С„РѕСЂРјСѓ РґР»СЏ РїСѓР±Р»РёРєР°С†РёРё
+                  Настройте хотя бы одну платформу для публикации
                 </p>
                 <a
                   href="/settings/access-keys"
                   className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  РќР°СЃС‚СЂРѕРёС‚СЊ РєР»СЋС‡Рё
+                  Настроить ключи
                 </a>
               </div>
             )}
@@ -314,9 +314,9 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <span className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                рџљЂ
+                🚀
               </span>
-              РџСѓР±Р»РёРєР°С†РёСЏ
+              Публикация
             </h3>
             
             <div className="space-y-4">
@@ -328,10 +328,10 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
                 {isPublishing ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>РџСѓР±Р»РёРєСѓРµРј...</span>
+                    <span>Публикуем...</span>
                   </>
                 ) : (
-                  <span>РћРїСѓР±Р»РёРєРѕРІР°С‚СЊ</span>
+                  <span>Опубликовать</span>
                 )}
               </button>
               
@@ -340,24 +340,24 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
                 disabled={isPublishing}
                 className="w-full px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 disabled:bg-gray-100 disabled:cursor-not-allowed transition-all duration-200"
               >
-                РћС‡РёСЃС‚РёС‚СЊ С„РѕСЂРјСѓ
+                Очистить форму
               </button>
               
               {/* Quick Stats */}
               <div className="pt-4 border-t border-gray-100">
                 <div className="text-sm text-gray-600 space-y-2">
                   <div className="flex justify-between">
-                    <span>РЎРёРјРІРѕР»РѕРІ:</span>
+                    <span>Символов:</span>
                     <span className={content.length > 3500 ? 'text-yellow-600 font-medium' : ''}>
                       {content.length}/4096
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>РР·РѕР±СЂР°Р¶РµРЅРёР№:</span>
+                    <span>Изображений:</span>
                     <span>{images.length}/10</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>РџР»Р°С‚С„РѕСЂРјС‹:</span>
+                    <span>Платформы:</span>
                     <span>{configuredPlatforms.length}</span>
                   </div>
                 </div>
@@ -368,13 +368,13 @@ export const PostForm: React.FC<PostFormProps> = ({ onSubmit, isPublishing, conf
           {/* Tips Card */}
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6">
             <h4 className="font-semibold text-gray-900 mb-3">
-              рџ’Ў РЎРѕРІРµС‚С‹
+              💡 Советы
             </h4>
             <div className="space-y-2 text-sm text-gray-600">
-              <p>вЂў РСЃРїРѕР»СЊР·СѓР№С‚Рµ СЌРјРѕРґР·Рё РґР»СЏ РїСЂРёРІР»РµС‡РµРЅРёСЏ РІРЅРёРјР°РЅРёСЏ</p>
-              <p>вЂў Р”РѕР±Р°РІСЊС‚Рµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РґР»СЏ Р±РѕР»СЊС€РµР№ РІРѕРІР»РµС‡С‘РЅРЅРѕСЃС‚Рё</p>
-              <p>вЂў РћРїС‚РёРјР°Р»СЊРЅР°СЏ РґР»РёРЅР° РїРѕСЃС‚Р°: 100-300 СЃРёРјРІРѕР»РѕРІ</p>
-              <p>вЂў Р›СѓС‡С€РµРµ РІСЂРµРјСЏ РґР»СЏ РїСѓР±Р»РёРєР°С†РёРё: 19:00-21:00</p>
+              <p>• Используйте эмодзи для привлечения внимания</p>
+              <p>• Добавьте изображения для большей вовлечённости</p>
+              <p>• Оптимальная длина поста: 100-300 символов</p>
+              <p>• Лучшее время для публикации: 19:00-21:00</p>
             </div>
           </div>
         </div>

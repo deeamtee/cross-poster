@@ -25,8 +25,8 @@ export function getRelativeTime(date: Date | string): string {
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
   
-  if (days > 0) return `${days} РґРЅ. РЅР°Р·Р°Рґ`;
-  if (hours > 0) return `${hours} С‡. РЅР°Р·Р°Рґ`;
-  if (minutes > 0) return `${minutes} РјРёРЅ. РЅР°Р·Р°Рґ`;
-  return 'С‚РѕР»СЊРєРѕ С‡С‚Рѕ';
+  if (days > 0) return `${days} дн. назад`;
+  if (hours > 0) return `${hours} ч. назад`;
+  if (minutes > 0) return `${minutes} мин. назад`;
+  return 'только что';
 }

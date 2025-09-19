@@ -19,7 +19,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
         onClick={signOut}
         className="text-sm text-red-600 hover:text-red-700 transition-colors"
       >
-        Р’С‹Р№С‚Рё
+        Выйти
       </button>
     </div>
   );

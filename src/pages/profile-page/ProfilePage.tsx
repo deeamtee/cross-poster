@@ -36,10 +36,10 @@ export const ProfilePage: React.FC = () => {
       // Update user profile with new photo URL
       await userProfileService.updateProfile(user, { photoURL });
       
-      setSuccess('Р¤РѕС‚Рѕ РїСЂРѕС„РёР»СЏ СѓСЃРїРµС€РЅРѕ РѕР±РЅРѕРІР»РµРЅРѕ');
+      setSuccess('Фото профиля успешно обновлено');
     } catch (err) {
       console.error('Error uploading profile photo:', err);
-      setError('РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ С„РѕС‚Рѕ РїСЂРѕС„РёР»СЏ');
+      setError('Не удалось загрузить фото профиля');
     } finally {
       setLoading(false);
       // Reset file input
@@ -58,11 +58,11 @@ export const ProfilePage: React.FC = () => {
 
     try {
       await userProfileService.updateProfile(user, { displayName });
-      setSuccess('РџСЂРѕС„РёР»СЊ СѓСЃРїРµС€РЅРѕ РѕР±РЅРѕРІР»РµРЅ');
+      setSuccess('Профиль успешно обновлен');
       setIsEditing(false);
     } catch (err) {
       console.error('Error updating profile:', err);
-      setError('РќРµ СѓРґР°Р»РѕСЃСЊ РѕР±РЅРѕРІРёС‚СЊ РїСЂРѕС„РёР»СЊ');
+      setError('Не удалось обновить профиль');
     } finally {
       setLoading(false);
     }
@@ -86,7 +86,7 @@ export const ProfilePage: React.FC = () => {
   if (!isAuthenticated || !user) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p>РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅРµ Р°РІС‚РѕСЂРёР·РѕРІР°РЅ</p>
+        <p>Пользователь не авторизован</p>
       </div>
     );
   }
@@ -94,7 +94,7 @@ export const ProfilePage: React.FC = () => {
   return (
     <div className="max-w-3xl mx-auto">
       <Card>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">РџСЂРѕС„РёР»СЊ</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Профиль</h2>
         
         <div className="flex flex-col md:flex-row gap-8">
           {/* Profile Photo Section */}
@@ -118,7 +118,7 @@ export const ProfilePage: React.FC = () => {
                 onClick={triggerFileInput}
                 disabled={loading}
                 className="absolute bottom-2 right-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 shadow-md transition-colors"
-                title="РР·РјРµРЅРёС‚СЊ С„РѕС‚Рѕ"
+                title="Изменить фото"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -137,9 +137,9 @@ export const ProfilePage: React.FC = () => {
             />
             
             <p className="mt-4 text-sm text-gray-600 text-center">
-              JPG, PNG РёР»Рё GIF
+              JPG, PNG или GIF
               <br />
-              РњР°РєСЃ. СЂР°Р·РјРµСЂ: 5MB
+              Макс. размер: 5MB
             </p>
           </div>
           
@@ -161,7 +161,7 @@ export const ProfilePage: React.FC = () => {
               
               <div>
                 <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-1">
-                  РРјСЏ
+                  Имя
                 </label>
                 <input
                   id="displayName"
@@ -179,7 +179,7 @@ export const ProfilePage: React.FC = () => {
                     onClick={() => setIsEditing(true)}
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
                   >
-                    Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ РїСЂРѕС„РёР»СЊ
+                    Редактировать профиль
                   </button>
                 ) : (
                   <>
@@ -191,10 +191,10 @@ export const ProfilePage: React.FC = () => {
                       {loading ? (
                         <span className="flex items-center">
                           <Spinner size="sm" className="mr-2" />
-                          РЎРѕС…СЂР°РЅРµРЅРёРµ...
+                          Сохранение...
                         </span>
                       ) : (
-                        'РЎРѕС…СЂР°РЅРёС‚СЊ'
+                        'Сохранить'
                       )}
                     </button>
                     <button
@@ -202,7 +202,7 @@ export const ProfilePage: React.FC = () => {
                       disabled={loading}
                       className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-md transition-colors disabled:opacity-50"
                     >
-                      РћС‚РјРµРЅР°
+                      Отмена
                     </button>
                   </>
                 )}

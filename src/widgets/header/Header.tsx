@@ -51,14 +51,14 @@ export const Header: React.FC<HeaderProps> = ({ onAuthClick }) => {
                     to="/settings"
                     className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg font-medium transition-colors text-sm"
                   >
-                    РќР°СЃС‚СЂРѕР№РєРё
+                    Настройки
                   </Link>
                   
                   <button
                     onClick={handleSignOut}
                     className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg font-medium transition-colors text-sm"
                   >
-                    Р’С‹Р№С‚Рё
+                    Выйти
                   </button>
                 </div>
               </>
@@ -67,7 +67,7 @@ export const Header: React.FC<HeaderProps> = ({ onAuthClick }) => {
                 onClick={handleAuthClick}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
               >
-                Р’РѕР№С‚Рё
+                Войти
               </button>
             )}
           </div>

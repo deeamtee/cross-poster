@@ -5,8 +5,8 @@ export const SettingsOverviewPage: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">РќР°СЃС‚СЂРѕР№РєРё РїСЂРёР»РѕР¶РµРЅРёСЏ</h1>
-        <p className="text-gray-600">РЈРїСЂР°РІР»РµРЅРёРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРµР№ Рё РїРѕРґРєР»СЋС‡РµРЅРёРµРј Рє РїР»Р°С‚С„РѕСЂРјР°Рј</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Настройки приложения</h1>
+        <p className="text-gray-600">Управление конфигурацией и подключением к платформам</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -20,10 +20,10 @@ export const SettingsOverviewPage: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
               </svg>
             </div>
-            <h3 className="ml-3 text-lg font-semibold text-gray-900">РљР»СЋС‡Рё РґРѕСЃС‚СѓРїР°</h3>
+            <h3 className="ml-3 text-lg font-semibold text-gray-900">Ключи доступа</h3>
           </div>
           <p className="text-gray-600">
-            РќР°СЃС‚СЂРѕР№С‚Рµ С‚РѕРєРµРЅС‹ Рё РєР»СЋС‡Рё РґР»СЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Telegram Рё РґСЂСѓРіРёРј РїР»Р°С‚С„РѕСЂРјР°Рј
+            Настройте токены и ключи для подключения к Telegram и другим платформам
           </p>
         </Link>
         
@@ -34,10 +34,10 @@ export const SettingsOverviewPage: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            <h3 className="ml-3 text-lg font-semibold text-gray-400">РџСЂРѕС„РёР»СЊ</h3>
+            <h3 className="ml-3 text-lg font-semibold text-gray-400">Профиль</h3>
           </div>
           <p className="text-gray-400">
-            РЈРїСЂР°РІР»РµРЅРёРµ РїСЂРѕС„РёР»РµРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ (СЃРєРѕСЂРѕ)
+            Управление профилем пользователя (скоро)
           </p>
         </div>
         
@@ -49,10 +49,10 @@ export const SettingsOverviewPage: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <h3 className="ml-3 text-lg font-semibold text-gray-400">РќР°СЃС‚СЂРѕР№РєРё РїСЂРёР»РѕР¶РµРЅРёСЏ</h3>
+            <h3 className="ml-3 text-lg font-semibold text-gray-400">Настройки приложения</h3>
           </div>
           <p className="text-gray-400">
-            РћР±С‰РёРµ РЅР°СЃС‚СЂРѕР№РєРё Рё РїСЂРµРґРїРѕС‡С‚РµРЅРёСЏ (СЃРєРѕСЂРѕ)
+            Общие настройки и предпочтения (скоро)
           </p>
         </div>
       </div>

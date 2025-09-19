@@ -56,7 +56,7 @@ function App() {
       await configApi.saveConfig(newConfig);
     } catch (error) {
       console.error('Failed to save config:', error);
-      alert('РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ РєРѕРЅС„РёРіСѓСЂР°С†РёСЋ. РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РїРѕРїСЂРѕР±СѓР№С‚Рµ РµС‰Рµ СЂР°Р·.');
+      alert('Не удалось сохранить конфигурацию. Пожалуйста, попробуйте еще раз.');
     }
   };
 
@@ -65,7 +65,7 @@ function App() {
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <Spinner size="lg" className="mx-auto mb-4" />
-          <p className="text-gray-600">Р—Р°РіСЂСѓР·РєР°...</p>
+          <p className="text-gray-600">Загрузка...</p>
         </div>
       </div>
     );

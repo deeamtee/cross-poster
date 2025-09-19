@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 const sidebarItems = [
   {
     id: 'overview',
-    title: 'РћР±Р·РѕСЂ',
+    title: 'Обзор',
     path: '/settings',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -14,7 +14,7 @@ const sidebarItems = [
   },
   {
     id: 'access-keys',
-    title: 'РљР»СЋС‡Рё РґРѕСЃС‚СѓРїР°',
+    title: 'Ключи доступа',
     path: '/settings/access-keys',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -24,7 +24,7 @@ const sidebarItems = [
   },
   {
     id: 'profile',
-    title: 'РџСЂРѕС„РёР»СЊ',
+    title: 'Профиль',
     path: '/settings/profile',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -34,7 +34,7 @@ const sidebarItems = [
   },
   {
     id: 'general',
-    title: 'РћР±С‰РёРµ РЅР°СЃС‚СЂРѕР№РєРё',
+    title: 'Общие настройки',
     path: '/settings/general',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,11 +53,11 @@ export const SettingsSidebar: React.FC = () => {
     <aside className="w-64 bg-gray-50 border-r border-gray-200">
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">РќР°СЃС‚СЂРѕР№РєРё</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Настройки</h2>
           <Link
             to="/"
             className="text-gray-500 hover:text-gray-700 transition-colors"
-            title="Р’РµСЂРЅСѓС‚СЊСЃСЏ РЅР° РіР»Р°РІРЅСѓСЋ"
+            title="Вернуться на главную"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -78,7 +78,7 @@ export const SettingsSidebar: React.FC = () => {
                 >
                   <span className="mr-3 text-gray-300">{item.icon}</span>
                   {item.title}
-                  <span className="ml-auto text-xs text-gray-300">(СЃРєРѕСЂРѕ)</span>
+                  <span className="ml-auto text-xs text-gray-300">(скоро)</span>
                 </div>
               );
             }

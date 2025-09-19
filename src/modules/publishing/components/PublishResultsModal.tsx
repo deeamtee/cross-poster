@@ -12,7 +12,7 @@ export const PublishResultsModal: React.FC<PublishResultsProps> = ({ results, on
   if (!results) return null;
 
   return (
-    <Modal isOpen={!!results} onClose={onClose} title="Р РµР·СѓР»СЊС‚Р°С‚С‹ РїСѓР±Р»РёРєР°С†РёРё">
+    <Modal isOpen={!!results} onClose={onClose} title="Результаты публикации">
       <LocalPublishResults results={results} onClose={onClose} />
     </Modal>
   );

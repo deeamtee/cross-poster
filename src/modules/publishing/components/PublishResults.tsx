@@ -16,9 +16,9 @@ export const PublishResults: React.FC<PublishResultsProps> = ({ results, onClose
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <div className="w-5 h-5 bg-green-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-xs">вњ“</span>
+              <span className="text-white text-xs">✓</span>
             </div>
-            <span className="font-semibold text-green-800">РЈСЃРїРµС€РЅРѕ</span>
+            <span className="font-semibold text-green-800">Успешно</span>
           </div>
           <div className="text-2xl font-bold text-green-800">{results.totalSuccess}</div>
         </div>
@@ -26,9 +26,9 @@ export const PublishResults: React.FC<PublishResultsProps> = ({ results, onClose
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-xs">Г—</span>
+              <span className="text-white text-xs">×</span>
             </div>
-            <span className="font-semibold text-red-800">РћС€РёР±РєРё</span>
+            <span className="font-semibold text-red-800">Ошибки</span>
           </div>
           <div className="text-2xl font-bold text-red-800">{results.totalFailure}</div>
         </div>
@@ -58,11 +58,11 @@ export const PublishResults: React.FC<PublishResultsProps> = ({ results, onClose
               <div className="flex items-center gap-1">
                 {result.success ? (
                   <div className="w-5 h-5 bg-green-600 rounded-full flex items-center justify-center">
-                    <span className="text-white text-xs">вњ“</span>
+                    <span className="text-white text-xs">✓</span>
                   </div>
                 ) : (
                   <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center">
-                    <span className="text-white text-xs">Г—</span>
+                    <span className="text-white text-xs">×</span>
                   </div>
                 )}
               </div>
@@ -71,7 +71,7 @@ export const PublishResults: React.FC<PublishResultsProps> = ({ results, onClose
             {result.success ? (
               <div className="space-y-2">
                 <p className="text-green-800 font-medium">
-                  РџРѕСЃС‚ СѓСЃРїРµС€РЅРѕ РѕРїСѓР±Р»РёРєРѕРІР°РЅ
+                  Пост успешно опубликован
                 </p>
                 {result.messageId && (
                   <div className="flex items-center gap-1 text-sm text-green-700">
@@ -86,7 +86,7 @@ export const PublishResults: React.FC<PublishResultsProps> = ({ results, onClose
                   <span className="text-white text-xs">!</span>
                 </div>
                 <div className="text-red-800">
-                  <span className="font-medium">РћС€РёР±РєР°:</span>
+                  <span className="font-medium">Ошибка:</span>
                   <p className="text-sm mt-1">{result.error}</p>
                 </div>
               </div>
@@ -100,7 +100,7 @@ export const PublishResults: React.FC<PublishResultsProps> = ({ results, onClose
           onClick={onClose} 
           className="px-8 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
         >
-          Р—Р°РєСЂС‹С‚СЊ
+          Закрыть
         </button>
       </div>
     </div>

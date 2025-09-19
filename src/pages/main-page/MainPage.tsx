@@ -31,7 +31,7 @@ export const MainPage: React.FC<MainPageProps> = ({
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Р—Р°РіСЂСѓР·РєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё...</p>
+          <p className="text-gray-600">Загрузка конфигурации...</p>
         </div>
       </div>
     );
@@ -52,16 +52,16 @@ export const MainPage: React.FC<MainPageProps> = ({
         ) : (
           <div className="text-center py-12">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Р”РѕР±СЂРѕ РїРѕР¶Р°Р»РѕРІР°С‚СЊ РІ Cross Poster!
+              Добро пожаловать в Cross Poster!
             </h2>
             <p className="text-gray-600 mb-8">
-              Р’РѕР№РґРёС‚Рµ РІ СЃРёСЃС‚РµРјСѓ, С‡С‚РѕР±С‹ РЅР°С‡Р°С‚СЊ РїСѓР±Р»РёРєРѕРІР°С‚СЊ РїРѕСЃС‚С‹ РІ СЃРѕС†РёР°Р»СЊРЅС‹Рµ СЃРµС‚Рё
+              Войдите в систему, чтобы начать публиковать посты в социальные сети
             </p>
             <button
               onClick={handleAuthClick}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors text-lg"
             >
-              РќР°С‡Р°С‚СЊ СЂР°Р±РѕС‚Сѓ
+              Начать работу
             </button>
           </div>
         )}
