@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth } from '../hooks/context';
+import { useAuth } from '../context';
 
 interface UserMenuProps {
   className?: string;
@@ -19,7 +19,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
         onClick={signOut}
         className="text-sm text-red-600 hover:text-red-700 transition-colors"
       >
-        Выйти
+        Р’С‹Р№С‚Рё
       </button>
     </div>
   );

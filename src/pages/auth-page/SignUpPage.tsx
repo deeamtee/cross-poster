@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SignUpForm } from '@/modules/auth/components/SignUpForm';
+import { SignUpForm } from '@modules/auth';
 
 export const SignUpPage: React.FC = () => {
   const navigate = useNavigate();

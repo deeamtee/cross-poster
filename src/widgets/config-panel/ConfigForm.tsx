@@ -1,5 +1,5 @@
-﻿import React, { useState, useEffect } from "react";
-import type { AppConfig, TelegramConfig, VKConfig, Platform } from "@core/types";
+import React, { useState, useEffect } from "react";
+import type { AppConfig, TelegramConfig, VKConfig, Platform } from "@types";
 import { TelegramConfigCard } from "./TelegramConfigCard";
 import { VKConfigCard } from "./VKConfigCard";
 import { getPlatformConfig, updatePlatformConfigInAppConfig } from "./ConfigForm.utils";

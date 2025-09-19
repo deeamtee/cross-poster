@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { getConfiguredPlatforms } from '../../modules/platform';
-import { crossPosterService } from '../../services/cross-poster';
+import { getConfiguredPlatforms } from '@modules/platform';
+import { crossPosterService } from '@modules/publishing';
 import { PostForm } from './PostForm';
-import type { AppConfig, PostDraft, PublishResponse } from '../../core/types';
+import type { AppConfig, PostDraft, PublishResponse } from '@types';
 
 interface PostComposerProps {
   config: AppConfig;

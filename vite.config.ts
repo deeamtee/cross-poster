@@ -15,7 +15,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@core': path.resolve(__dirname, './src/core'),
+      '@types': path.resolve(__dirname, './src/types'),
+      '@utils': path.resolve(__dirname, './src/utils'),
+      '@ui': path.resolve(__dirname, './src/ui'),
+      '@modules': path.resolve(__dirname, './src/modules'),
     },
   },
   build: {
@@ -23,3 +26,4 @@ export default defineConfig({
     assetsDir: 'assets',
   },
 })
+

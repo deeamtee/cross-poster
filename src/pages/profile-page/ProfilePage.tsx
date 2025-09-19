@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useAuth } from '../../modules/auth/hooks/context';
-import { userProfileService } from '../../services/user-profile';
-import { getUserInitials, hasProfilePhoto } from '../../modules/user/utils';
-import { Spinner } from '@core/ui/spinner';
-import { Card } from '@core/ui/card';
+import { useAuth } from '@modules/auth';
+import { userProfileService } from '@modules/profile';
+import { getUserInitials, hasProfilePhoto } from '@modules/user';
+import { Spinner } from '@/ui/spinner';
+import { Card } from '@/ui/card';
 
 export const ProfilePage: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
@@ -36,10 +36,10 @@ export const ProfilePage: React.FC = () => {
       // Update user profile with new photo URL
       await userProfileService.updateProfile(user, { photoURL });
       
-      setSuccess('Фото профиля успешно обновлено');
+      setSuccess('Р¤РѕС‚Рѕ РїСЂРѕС„РёР»СЏ СѓСЃРїРµС€РЅРѕ РѕР±РЅРѕРІР»РµРЅРѕ');
     } catch (err) {
       console.error('Error uploading profile photo:', err);
-      setError('Не удалось загрузить фото профиля');
+      setError('РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ С„РѕС‚Рѕ РїСЂРѕС„РёР»СЏ');
     } finally {
       setLoading(false);
       // Reset file input
@@ -58,11 +58,11 @@ export const ProfilePage: React.FC = () => {
 
     try {
       await userProfileService.updateProfile(user, { displayName });
-      setSuccess('Профиль успешно обновлен');
+      setSuccess('РџСЂРѕС„РёР»СЊ СѓСЃРїРµС€РЅРѕ РѕР±РЅРѕРІР»РµРЅ');
       setIsEditing(false);
     } catch (err) {
       console.error('Error updating profile:', err);
-      setError('Не удалось обновить профиль');
+      setError('РќРµ СѓРґР°Р»РѕСЃСЊ РѕР±РЅРѕРІРёС‚СЊ РїСЂРѕС„РёР»СЊ');
     } finally {
       setLoading(false);
     }
@@ -86,7 +86,7 @@ export const ProfilePage: React.FC = () => {
   if (!isAuthenticated || !user) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p>Пользователь не авторизован</p>
+        <p>РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅРµ Р°РІС‚РѕСЂРёР·РѕРІР°РЅ</p>
       </div>
     );
   }
@@ -94,7 +94,7 @@ export const ProfilePage: React.FC = () => {
   return (
     <div className="max-w-3xl mx-auto">
       <Card>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Профиль</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">РџСЂРѕС„РёР»СЊ</h2>
         
         <div className="flex flex-col md:flex-row gap-8">
           {/* Profile Photo Section */}
@@ -118,7 +118,7 @@ export const ProfilePage: React.FC = () => {
                 onClick={triggerFileInput}
                 disabled={loading}
                 className="absolute bottom-2 right-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 shadow-md transition-colors"
-                title="Изменить фото"
+                title="РР·РјРµРЅРёС‚СЊ С„РѕС‚Рѕ"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -137,9 +137,9 @@ export const ProfilePage: React.FC = () => {
             />
             
             <p className="mt-4 text-sm text-gray-600 text-center">
-              JPG, PNG или GIF
+              JPG, PNG РёР»Рё GIF
               <br />
-              Макс. размер: 5MB
+              РњР°РєСЃ. СЂР°Р·РјРµСЂ: 5MB
             </p>
           </div>
           
@@ -161,7 +161,7 @@ export const ProfilePage: React.FC = () => {
               
               <div>
                 <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Имя
+                  РРјСЏ
                 </label>
                 <input
                   id="displayName"
@@ -179,7 +179,7 @@ export const ProfilePage: React.FC = () => {
                     onClick={() => setIsEditing(true)}
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
                   >
-                    Редактировать профиль
+                    Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ РїСЂРѕС„РёР»СЊ
                   </button>
                 ) : (
                   <>
@@ -191,10 +191,10 @@ export const ProfilePage: React.FC = () => {
                       {loading ? (
                         <span className="flex items-center">
                           <Spinner size="sm" className="mr-2" />
-                          Сохранение...
+                          РЎРѕС…СЂР°РЅРµРЅРёРµ...
                         </span>
                       ) : (
-                        'Сохранить'
+                        'РЎРѕС…СЂР°РЅРёС‚СЊ'
                       )}
                     </button>
                     <button
@@ -202,7 +202,7 @@ export const ProfilePage: React.FC = () => {
                       disabled={loading}
                       className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-md transition-colors disabled:opacity-50"
                     >
-                      Отмена
+                      РћС‚РјРµРЅР°
                     </button>
                   </>
                 )}

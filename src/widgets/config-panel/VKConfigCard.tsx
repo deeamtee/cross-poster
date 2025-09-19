@@ -1,6 +1,6 @@
-﻿import React, { useEffect, useMemo, useRef } from "react";
-import { Card } from "@core/ui/card";
-import type { VKConfig } from "@core/types";
+import React, { useEffect, useMemo, useRef } from "react";
+import { Card } from "@/ui/card";
+import type { VKConfig } from "@types";
 import {
   Auth,
   Config,
@@ -10,7 +10,7 @@ import {
   OneTapInternalEvents,
   WidgetEvents,
 } from "@vkid/sdk";
-import { saveVkTokenFromConfig, clearStoredVkToken } from "@/services/vk-token.storage";
+import { saveVkTokenFromConfig, clearStoredVkToken } from "@modules/publishing/lib";
 
 interface VKConfigCardProps {
   enabled: boolean;
@@ -31,15 +31,26 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
   const oneTapRef = useRef<OneTap | null>(null);
 
   useEffect(() => {
-    if (!enabled) {
-      if (oneTapRef.current) {
-        try {
-          oneTapRef.current.close();
-        } catch {}
+    const containerElement = containerRef.current;
+
+    const closeOneTap = () => {
+      if (!oneTapRef.current) {
+        return;
+      }
+
+      try {
+        oneTapRef.current.close();
+      } catch (error) {
+        console.error("VK ID OneTap close error:", error);
+      } finally {
         oneTapRef.current = null;
       }
-      if (containerRef.current) {
-        containerRef.current.innerHTML = "";
+    };
+
+    if (!enabled) {
+      closeOneTap();
+      if (containerElement) {
+        containerElement.innerHTML = "";
       }
       return;
     }
@@ -62,11 +73,11 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
       const oneTap = new OneTap();
       oneTapRef.current = oneTap;
 
-      if (containerRef.current) {
-        containerRef.current.innerHTML = "";
+      if (containerElement) {
+        containerElement.innerHTML = "";
         oneTap
           .render({
-            container: containerRef.current,
+            container: containerElement,
             showAlternativeLogin: true,
           })
           .on(WidgetEvents.ERROR, (error: unknown) => {
@@ -99,43 +110,38 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
 
               onConfigChange(updatedConfig);
               saveVkTokenFromConfig(updatedConfig);
-            } catch (err: unknown) {
-              console.error("VK ID exchange failed:", err);
+            } catch (error: unknown) {
+              console.error("VK ID exchange failed:", error);
             }
           });
       }
-    } catch (e) {
-      console.error("VK ID initialization failed:", e);
+    } catch (error) {
+      console.error("VK ID initialization failed:", error);
     }
 
     return () => {
-      if (oneTapRef.current) {
-        try {
-          oneTapRef.current.close();
-        } catch {}
-        oneTapRef.current = null;
-      }
-      if (containerRef.current) {
-        containerRef.current.innerHTML = "";
+      closeOneTap();
+      if (containerElement) {
+        containerElement.innerHTML = "";
       }
     };
   }, [enabled, config, onConfigChange]);
 
   const tokenStatus = useMemo(() => {
     if (!config.accessToken) {
-      return "����� �� ����祭";
+      return "????? ?? ?????";
     }
 
     if (!config.accessTokenExpiresAt) {
-      return "����� ����祭 (��� �ப� ����⢨�)";
+      return "????? ????? (??? ??? ??????)";
     }
 
     const expiresAt = new Date(config.accessTokenExpiresAt);
     if (Number.isNaN(expiresAt.getTime())) {
-      return "����� ����祭";
+      return "????? ?????";
     }
 
-    return `����� ��⥪��� ${expiresAt.toLocaleString()}`;
+    return `????? ?????? ${expiresAt.toLocaleString()}`;
   }, [config.accessToken, config.accessTokenExpiresAt]);
 
   const handleOwnerIdChange = (value: string) => {
@@ -166,14 +172,14 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900">VK</h3>
-            <p className="text-sm text-gray-500">����ன� �㡫���樨 � VK �१ VK ID</p>
+            <p className="text-sm text-gray-500">?????? ?????? ? VK ?? VK ID</p>
           </div>
         </div>
       }
     >
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">������� VK</span>
+          <span className="text-sm font-medium text-gray-700">??????? VK</span>
           <label htmlFor="vk-enabled" className="relative inline-block w-12 h-6 cursor-pointer">
             <input
               type="checkbox"
@@ -190,12 +196,12 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
           <div className="space-y-4">
             <div>
               <label htmlFor="vk-owner-id" className="block text-sm font-medium text-gray-700 mb-2">
-                Owner ID (������⥫�� ��� ��䨫� ��� ����⥫�� ��� ᮮ���⢠)
+                Owner ID (????????? ??? ???? ??? ??????? ??? ?????)
               </label>
               <input
                 id="vk-owner-id"
                 type="text"
-                placeholder="���ਬ��, -123456789"
+                placeholder="??????, -123456789"
                 value={config.ownerId}
                 onChange={(e) => handleOwnerIdChange(e.target.value)}
                 className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
@@ -204,32 +210,32 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
 
             <div className="p-3 bg-blue-50 rounded-lg space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-blue-700 font-medium">����� ⮪���</p>
+                <p className="text-sm text-blue-700 font-medium">????? ????</p>
                 {config.accessToken && (
                   <button
                     type="button"
                     onClick={handleClearToken}
                     className="text-xs text-blue-600 hover:text-blue-800"
                   >
-                    ������ ⮪��
+                    ?????? ???
                   </button>
                 )}
               </div>
               <p className="text-xs text-blue-700 leading-relaxed">{tokenStatus}</p>
               {config.userId && (
-                <p className="text-xs text-blue-700">���ਧ������ ���짮��⥫�: {config.userId}</p>
+                <p className="text-xs text-blue-700">?????????? ????????: {config.userId}</p>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                ���ਧ��� �१ VK ID
+                ??????? ?? VK ID
               </label>
               <div className="border rounded-lg p-4 bg-gray-50">
                 <div id="vkid-one-tap-container" ref={containerRef} />
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                ��᫥ �ᯥ譮� ���ਧ�樨 ⮪�� ��⮬���᪨ ��࠭���� � ����ன��� � �㤥� �ᯮ�짮��� ��� �㡫���権.
+                ??? ???? ?????? ??? ??????? ??????? ? ???????? ? ??? ??????? ??? ??????.
               </p>
             </div>
           </div>

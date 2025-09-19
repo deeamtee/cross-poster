@@ -1,2 +1,2 @@
-export { PublishResultsModal } from './PublishResultsModal';
 export { PublishResults } from './PublishResults';
+export { PublishResultsModal } from './PublishResultsModal';

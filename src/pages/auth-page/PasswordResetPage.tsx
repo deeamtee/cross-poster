@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PasswordResetForm } from '@/modules/auth/components/PasswordResetForm';
+import { PasswordResetForm } from '@modules/auth';
 
 export const PasswordResetPage: React.FC = () => {
   const navigate = useNavigate();

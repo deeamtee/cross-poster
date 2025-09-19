@@ -1,7 +1,7 @@
 import React from 'react';
-import { Modal } from '@core/ui/modal';
+import { Modal } from '@/ui/modal';
 import { PublishResults as LocalPublishResults } from './PublishResults';
-import type { PublishResponse } from '@core/types';
+import type { PublishResponse } from '@types';
 
 interface PublishResultsProps {
   results: PublishResponse | null;
@@ -12,7 +12,7 @@ export const PublishResultsModal: React.FC<PublishResultsProps> = ({ results, on
   if (!results) return null;
 
   return (
-    <Modal isOpen={!!results} onClose={onClose} title="Результаты публикации">
+    <Modal isOpen={!!results} onClose={onClose} title="Р РµР·СѓР»СЊС‚Р°С‚С‹ РїСѓР±Р»РёРєР°С†РёРё">
       <LocalPublishResults results={results} onClose={onClose} />
     </Modal>
   );

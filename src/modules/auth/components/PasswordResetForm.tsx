@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../hooks/context';
+import { useAuth } from '../context';
 
 interface PasswordResetFormProps {
   onBack: () => void;
@@ -21,8 +21,9 @@ export const PasswordResetForm: React.FC<PasswordResetFormProps> = ({ onBack }) 
     try {
       await sendPasswordResetEmail(email);
       setSuccess(true);
-    } catch (err) {
-      setError('Произошла ошибка при отправке письма');
+    } catch (error) {
+      console.error('Password reset error:', error);
+      setError('РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ РїРёСЃСЊРјР°');
     } finally {
       setLoading(false);
     }
@@ -46,18 +47,18 @@ export const PasswordResetForm: React.FC<PasswordResetFormProps> = ({ onBack }) 
             </div>
             
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Письмо отправлено
+              РџРёСЃСЊРјРѕ РѕС‚РїСЂР°РІР»РµРЅРѕ
             </h2>
             
             <p className="text-gray-600 mb-6">
-              Мы отправили инструкции по восстановлению пароля на адрес <strong>{email}</strong>
+              РњС‹ РѕС‚РїСЂР°РІРёР»Рё РёРЅСЃС‚СЂСѓРєС†РёРё РїРѕ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЋ РїР°СЂРѕР»СЏ РЅР° Р°РґСЂРµСЃ <strong>{email}</strong>
             </p>
             
             <button
               onClick={onBack}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
             >
-              Вернуться к входу
+              Р’РµСЂРЅСѓС‚СЊСЃСЏ Рє РІС…РѕРґСѓ
             </button>
           </div>
         </div>
@@ -69,11 +70,11 @@ export const PasswordResetForm: React.FC<PasswordResetFormProps> = ({ onBack }) 
     <div className="w-full max-w-md mx-auto">
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-          Восстановление пароля
+          Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РїР°СЂРѕР»СЏ
         </h2>
         
         <p className="text-gray-600 text-sm mb-6 text-center">
-          Введите адрес электронной почты, и мы отправим вам инструкции по восстановлению пароля.
+          Р’РІРµРґРёС‚Рµ Р°РґСЂРµСЃ СЌР»РµРєС‚СЂРѕРЅРЅРѕР№ РїРѕС‡С‚С‹, Рё РјС‹ РѕС‚РїСЂР°РІРёРј РІР°Рј РёРЅСЃС‚СЂСѓРєС†РёРё РїРѕ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЋ РїР°СЂРѕР»СЏ.
         </p>
         
         <form onSubmit={onSubmit} className="space-y-4">
@@ -103,7 +104,7 @@ export const PasswordResetForm: React.FC<PasswordResetFormProps> = ({ onBack }) 
             disabled={loading}
             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
           >
-            {loading ? 'Отправка...' : 'Отправить инструкции'}
+            {loading ? 'РћС‚РїСЂР°РІРєР°...' : 'РћС‚РїСЂР°РІРёС‚СЊ РёРЅСЃС‚СЂСѓРєС†РёРё'}
           </button>
         </form>
         
@@ -112,7 +113,7 @@ export const PasswordResetForm: React.FC<PasswordResetFormProps> = ({ onBack }) 
             onClick={onBack}
             className="text-blue-600 hover:text-blue-700 text-sm"
           >
-            ← Вернуться к входу
+            в†ђ Р’РµСЂРЅСѓС‚СЊСЃСЏ Рє РІС…РѕРґСѓ
           </button>
         </div>
       </div>

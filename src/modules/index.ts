@@ -1,5 +1,6 @@
-// Re-export all modules
-export * as auth from './auth';
-export * as platform from './platform';
-export * as publishing from './publishing';
-export * as user from './user';
+export * from './auth';
+export * from './configuration';
+export * from './platform';
+export * from './publishing';
+export * from './user';
+export * from './profile';

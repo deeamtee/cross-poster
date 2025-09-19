@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Input, Spinner } from '@core/ui';
-import type { AuthCredentials } from '@core/types';
-import { useAuth } from '..';
+import { Button, Input, Spinner } from '@/ui';
+import type { AuthCredentials } from '@types';
+import { useAuth } from '../context';
 
 interface SignUpFormProps {
   onSwitchToLogin: () => void;
@@ -53,7 +53,7 @@ export const SignUpForm = ({ onSwitchToLogin }: SignUpFormProps) => {
   };
 
   const handleInputChange = (field: keyof AuthCredentials, value: string) => {
-    setCredentials(prev => ({ ...prev, [field]: value }));
+    setCredentials((prev: AuthCredentials) => ({ ...prev, [field]: value }));
     if (error) setError(null);
   };
 
@@ -68,7 +68,7 @@ export const SignUpForm = ({ onSwitchToLogin }: SignUpFormProps) => {
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
           Регистрация
         </h2>
-        
+
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
@@ -83,7 +83,7 @@ export const SignUpForm = ({ onSwitchToLogin }: SignUpFormProps) => {
               placeholder="your@email.com"
             />
           </div>
-          
+
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Пароль
@@ -97,7 +97,7 @@ export const SignUpForm = ({ onSwitchToLogin }: SignUpFormProps) => {
               placeholder="••••••••"
             />
           </div>
-          
+
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
               Подтверждение пароля
@@ -111,7 +111,7 @@ export const SignUpForm = ({ onSwitchToLogin }: SignUpFormProps) => {
               placeholder="••••••••"
             />
           </div>
-          
+
           {(error || passwordError) && (
             <div className="bg-red-50 border border-red-200 rounded-md p-3">
               <p className="text-red-600 text-sm">
@@ -119,7 +119,7 @@ export const SignUpForm = ({ onSwitchToLogin }: SignUpFormProps) => {
               </p>
             </div>
           )}
-          
+
           <Button
             type="submit"
             disabled={loading}
@@ -129,7 +129,7 @@ export const SignUpForm = ({ onSwitchToLogin }: SignUpFormProps) => {
             {loading ? <Spinner /> : 'Зарегистрироваться'}
           </Button>
         </form>
-        
+
         <div className="mt-6 text-center">
           <div className="text-gray-600 text-sm flex items-center justify-center gap-1">
             <span>Уже есть аккаунт?</span>

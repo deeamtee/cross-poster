@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@core/ui/button';
-import { Input } from '@core/ui/input';
-import { Spinner } from '@core/ui/spinner';
-import type { AuthCredentials } from '@core/types';
-import { useAuth } from '..';
+import { Button } from '@/ui/button';
+import { Input } from '@/ui/input';
+import { Spinner } from '@/ui/spinner';
+import type { AuthCredentials } from '@types';
+import { useAuth } from '../context';
 
 interface LoginFormProps {
   onSwitchToSignUp: () => void;
@@ -22,7 +22,7 @@ export const LoginForm = ({ onSwitchToSignUp, onSwitchToPasswordReset }: LoginFo
     e.preventDefault();
     setError(null);
     setLoading(true);
-    
+
     try {
       const result = await signIn(credentials);
       if (result.error) {
@@ -40,7 +40,7 @@ export const LoginForm = ({ onSwitchToSignUp, onSwitchToPasswordReset }: LoginFo
   };
 
   const handleInputChange = (field: keyof AuthCredentials, value: string) => {
-    setCredentials(prev => ({ ...prev, [field]: value }));
+    setCredentials((prev: AuthCredentials) => ({ ...prev, [field]: value }));
     if (error) setError(null);
   };
 
@@ -50,7 +50,7 @@ export const LoginForm = ({ onSwitchToSignUp, onSwitchToPasswordReset }: LoginFo
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
           Вход в систему
         </h2>
-        
+
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
@@ -65,7 +65,7 @@ export const LoginForm = ({ onSwitchToSignUp, onSwitchToPasswordReset }: LoginFo
               placeholder="your@email.com"
             />
           </div>
-          
+
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Пароль
@@ -79,13 +79,13 @@ export const LoginForm = ({ onSwitchToSignUp, onSwitchToPasswordReset }: LoginFo
               placeholder="••••••••"
             />
           </div>
-          
+
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-md p-3">
               <p className="text-red-600 text-sm">{error}</p>
             </div>
           )}
-          
+
           <Button
             type="submit"
             disabled={loading}
@@ -95,7 +95,7 @@ export const LoginForm = ({ onSwitchToSignUp, onSwitchToPasswordReset }: LoginFo
             {loading ? <Spinner /> : 'Войти'}
           </Button>
         </form>
-        
+
         <div className="mt-6 text-center space-y-4">
           <Button
             onClick={onSwitchToPasswordReset}
@@ -104,7 +104,7 @@ export const LoginForm = ({ onSwitchToSignUp, onSwitchToPasswordReset }: LoginFo
           >
             Забыли пароль?
           </Button>
-          
+
           <div className="text-gray-600 text-sm flex items-center justify-center gap-1">
             <span>Нет аккаунта?</span>
             <Button

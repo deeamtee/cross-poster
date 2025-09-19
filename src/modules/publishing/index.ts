@@ -1,4 +1,5 @@
-// Re-export all publishing module components
-export * from './components';
+export * from './api';
 export * from './hooks';
+export * from './components';
+export * from './lib';
 export * from './types';

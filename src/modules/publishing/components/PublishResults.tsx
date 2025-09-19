@@ -1,5 +1,5 @@
 import React from 'react';
-import type { PublishResponse } from '../../../core/types';
+import type { PublishResponse, PostResult } from '@types';
 
 interface PublishResultsProps {
   results: PublishResponse | null;
@@ -16,9 +16,9 @@ export const PublishResults: React.FC<PublishResultsProps> = ({ results, onClose
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <div className="w-5 h-5 bg-green-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-xs">✓</span>
+              <span className="text-white text-xs">вњ“</span>
             </div>
-            <span className="font-semibold text-green-800">Успешно</span>
+            <span className="font-semibold text-green-800">РЈСЃРїРµС€РЅРѕ</span>
           </div>
           <div className="text-2xl font-bold text-green-800">{results.totalSuccess}</div>
         </div>
@@ -26,9 +26,9 @@ export const PublishResults: React.FC<PublishResultsProps> = ({ results, onClose
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-xs">×</span>
+              <span className="text-white text-xs">Г—</span>
             </div>
-            <span className="font-semibold text-red-800">Ошибки</span>
+            <span className="font-semibold text-red-800">РћС€РёР±РєРё</span>
           </div>
           <div className="text-2xl font-bold text-red-800">{results.totalFailure}</div>
         </div>
@@ -36,7 +36,7 @@ export const PublishResults: React.FC<PublishResultsProps> = ({ results, onClose
 
       {/* Detailed Results */}
       <div className="space-y-3 mb-6">
-        {results.results.map((result: any, index: number) => (
+        {results.results.map((result: PostResult, index: number) => (
           <div
             key={`${result.platform}-${index}`}
             className={`border rounded-lg p-4 ${
@@ -58,11 +58,11 @@ export const PublishResults: React.FC<PublishResultsProps> = ({ results, onClose
               <div className="flex items-center gap-1">
                 {result.success ? (
                   <div className="w-5 h-5 bg-green-600 rounded-full flex items-center justify-center">
-                    <span className="text-white text-xs">✓</span>
+                    <span className="text-white text-xs">вњ“</span>
                   </div>
                 ) : (
                   <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center">
-                    <span className="text-white text-xs">×</span>
+                    <span className="text-white text-xs">Г—</span>
                   </div>
                 )}
               </div>
@@ -71,7 +71,7 @@ export const PublishResults: React.FC<PublishResultsProps> = ({ results, onClose
             {result.success ? (
               <div className="space-y-2">
                 <p className="text-green-800 font-medium">
-                  Пост успешно опубликован
+                  РџРѕСЃС‚ СѓСЃРїРµС€РЅРѕ РѕРїСѓР±Р»РёРєРѕРІР°РЅ
                 </p>
                 {result.messageId && (
                   <div className="flex items-center gap-1 text-sm text-green-700">
@@ -86,7 +86,7 @@ export const PublishResults: React.FC<PublishResultsProps> = ({ results, onClose
                   <span className="text-white text-xs">!</span>
                 </div>
                 <div className="text-red-800">
-                  <span className="font-medium">Ошибка:</span>
+                  <span className="font-medium">РћС€РёР±РєР°:</span>
                   <p className="text-sm mt-1">{result.error}</p>
                 </div>
               </div>
@@ -100,7 +100,7 @@ export const PublishResults: React.FC<PublishResultsProps> = ({ results, onClose
           onClick={onClose} 
           className="px-8 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
         >
-          Закрыть
+          Р—Р°РєСЂС‹С‚СЊ
         </button>
       </div>
     </div>

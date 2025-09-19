@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card } from '@core/ui/card';
-import type { TelegramConfig } from '@core/types';
+import { Card } from '@/ui/card';
+import type { TelegramConfig } from '@types';
 
 interface TelegramConfigCardProps {
   enabled: boolean;
@@ -34,7 +34,7 @@ export const TelegramConfigCard: React.FC<TelegramConfigCardProps> = ({
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Telegram</h3>
-            <p className="text-sm text-gray-500">Настройка бота для публикации постов</p>
+            <p className="text-sm text-gray-500">РќР°СЃС‚СЂРѕР№РєР° Р±РѕС‚Р° РґР»СЏ РїСѓР±Р»РёРєР°С†РёРё РїРѕСЃС‚РѕРІ</p>
           </div>
         </div>
       }
@@ -42,7 +42,7 @@ export const TelegramConfigCard: React.FC<TelegramConfigCardProps> = ({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-gray-700">
-            Включить Telegram
+            Р’РєР»СЋС‡РёС‚СЊ Telegram
           </span>
           <label htmlFor="telegram-enabled" className="relative inline-block w-12 h-6 cursor-pointer">
             <input
@@ -65,7 +65,7 @@ export const TelegramConfigCard: React.FC<TelegramConfigCardProps> = ({
               <input
                 id="telegram-bot-token"
                 type="password"
-                placeholder="Токен бота Telegram"
+                placeholder="РўРѕРєРµРЅ Р±РѕС‚Р° Telegram"
                 value={config.botToken}
                 onChange={(e) => handleTokenChange(e.target.value)}
                 className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
@@ -79,7 +79,7 @@ export const TelegramConfigCard: React.FC<TelegramConfigCardProps> = ({
               <input
                 id="telegram-chat-id"
                 type="text"
-                placeholder="@channel или ID чата"
+                placeholder="@channel РёР»Рё ID С‡Р°С‚Р°"
                 value={config.chatId}
                 onChange={(e) => handleIdChange(e.target.value)}
                 className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
@@ -88,10 +88,10 @@ export const TelegramConfigCard: React.FC<TelegramConfigCardProps> = ({
             
             <div className="p-3 bg-blue-50 rounded-lg">
               <p className="text-xs text-blue-700 leading-relaxed">
-                <strong>💡 Как получить токен и Chat ID:</strong><br/>
-                1. Создайте бота через <a href="https://t.me/BotFather" target="_blank" rel="noopener noreferrer" className="underline font-medium">@BotFather</a><br/>
-                2. Добавьте бота в ваш канал/группу<br/>
-                3. Укажите @channel или ID чата в поле ниже
+                <strong>рџ’Ў РљР°Рє РїРѕР»СѓС‡РёС‚СЊ С‚РѕРєРµРЅ Рё Chat ID:</strong><br/>
+                1. РЎРѕР·РґР°Р№С‚Рµ Р±РѕС‚Р° С‡РµСЂРµР· <a href="https://t.me/BotFather" target="_blank" rel="noopener noreferrer" className="underline font-medium">@BotFather</a><br/>
+                2. Р”РѕР±Р°РІСЊС‚Рµ Р±РѕС‚Р° РІ РІР°С€ РєР°РЅР°Р»/РіСЂСѓРїРїСѓ<br/>
+                3. РЈРєР°Р¶РёС‚Рµ @channel РёР»Рё ID С‡Р°С‚Р° РІ РїРѕР»Рµ РЅРёР¶Рµ
               </p>
             </div>
           </div>

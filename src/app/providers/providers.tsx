@@ -1,6 +1,6 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from '../../modules/auth/hooks/context';
+import { AuthProvider } from '@modules/auth';
 
 // Create a query client
 const queryClient = new QueryClient({

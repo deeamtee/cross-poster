@@ -7,12 +7,12 @@ import { AccessKeysPage } from '@/pages/access-keys-page'
 import { LoginPage } from '@/pages/auth-page'
 import { SignUpPage } from '@/pages/auth-page'
 import { PasswordResetPage } from '@/pages/auth-page'
-import { useAuth } from '@/modules/auth'
-import { Spinner } from '@core/ui/spinner'
-import type { AppConfig } from '@core/types'
-import { configApi } from '@/services/config'
+import { useAuth } from '@modules/auth'
+import { Spinner } from '@/ui/spinner'
+import type { AppConfig } from '@types'
+import { configApi } from '@modules/configuration'
 import { SettingsOverviewPage } from '@/pages/settings-overview-page'
-import { RedirectIfAuthenticated } from '@/components/RedirectIfAuthenticated'
+import { RedirectIfAuthenticated } from '@/widgets/redirect-if-authentificated/RedirectIfAuthenticated'
 
 function App() {
   const { user, loading: authLoading } = useAuth();
@@ -56,7 +56,7 @@ function App() {
       await configApi.saveConfig(newConfig);
     } catch (error) {
       console.error('Failed to save config:', error);
-      alert('Не удалось сохранить конфигурацию. Пожалуйста, попробуйте еще раз.');
+      alert('РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ РєРѕРЅС„РёРіСѓСЂР°С†РёСЋ. РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РїРѕРїСЂРѕР±СѓР№С‚Рµ РµС‰Рµ СЂР°Р·.');
     }
   };
 
@@ -65,7 +65,7 @@ function App() {
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <Spinner size="lg" className="mx-auto mb-4" />
-          <p className="text-gray-600">Загрузка...</p>
+          <p className="text-gray-600">Р—Р°РіСЂСѓР·РєР°...</p>
         </div>
       </div>
     );

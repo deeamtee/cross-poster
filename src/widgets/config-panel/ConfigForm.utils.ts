@@ -1,10 +1,10 @@
-﻿import type { AppConfig, TelegramConfig, VKConfig, Platform } from "@core/types";
+import type { AppConfig, TelegramConfig, VKConfig, Platform, PlatformConfig } from "@types";
 
 export const getPlatformConfig = (
   config: AppConfig,
   platform: Platform
 ): { enabled: boolean; config: TelegramConfig | VKConfig } => {
-  const platformConfig = config.platforms.find((p) => p.platform === platform);
+  const platformConfig = config.platforms.find((p: PlatformConfig) => p.platform === platform);
 
   if (platform === "telegram") {
     return {
@@ -26,7 +26,7 @@ export const updatePlatformConfigInAppConfig = (
   platformConfig: TelegramConfig | VKConfig
 ): AppConfig => {
   const newPlatforms = [...config.platforms];
-  const existingPlatformIndex = newPlatforms.findIndex((p) => p.platform === platform);
+  const existingPlatformIndex = newPlatforms.findIndex((p: PlatformConfig) => p.platform === platform);
 
   if (existingPlatformIndex >= 0) {
     newPlatforms[existingPlatformIndex] = {
