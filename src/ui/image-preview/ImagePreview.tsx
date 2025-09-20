@@ -32,9 +32,20 @@ export const ImagePreview: React.FC<ImagePreviewProps> = React.memo(({
         type="button"
         onClick={() => onRemove(index)}
         disabled={isDisabled}
-        className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm transition-colors"
+        className="p-1.5 text-gray-400 hover:text-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 disabled:text-gray-300 disabled:cursor-not-allowed cursor-pointer transition-colors"
+        aria-label={`Удалить изображение ${index + 1}`}
+        title="Удалить изображение"
       >
-        Г—
+        <svg
+          className="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.6}
+        >
+          <path strokeLinecap="round" d="M18 6L6 18" />
+          <path strokeLinecap="round" d="M6 6l12 12" />
+        </svg>
       </button>
     </div>
   );
