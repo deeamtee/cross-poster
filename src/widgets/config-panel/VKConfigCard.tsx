@@ -196,6 +196,12 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
   useEffect(() => {
     const containerElement = containerRef.current;
 
+    const clearContainer = () => {
+      if (containerElement) {
+        containerElement.innerHTML = "";
+      }
+    };
+
     const closeOneTap = () => {
       if (!oneTapRef.current) {
         return;
@@ -210,28 +216,25 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
       }
     };
 
-    if (!enabled) {
+    const destroyWidget = () => {
       closeOneTap();
-      if (containerElement) {
-        containerElement.innerHTML = "";
-      }
-      return () => {
-        closeOneTap();
-        if (containerElement) {
-          containerElement.innerHTML = "";
-        }
-      };
+      clearContainer();
+    };
+
+    if (!enabled) {
+      destroyWidget();
+      return destroyWidget;
+    }
+
+    if (config.accessToken) {
+      destroyWidget();
+      return destroyWidget;
     }
 
     const clientId = Number(import.meta.env.VITE_VK_CLIENT_ID);
     if (!clientId || Number.isNaN(clientId)) {
       console.error("VK ID: VITE_VK_CLIENT_ID is not set or invalid");
-      return () => {
-        closeOneTap();
-        if (containerElement) {
-          containerElement.innerHTML = "";
-        }
-      };
+      return destroyWidget;
     }
 
     try {
@@ -247,7 +250,7 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
       oneTapRef.current = oneTap;
 
       if (containerElement) {
-        containerElement.innerHTML = "";
+        clearContainer();
         oneTap
           .render({
             container: containerElement,
@@ -292,13 +295,8 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
       console.error("VK ID initialization failed:", error);
     }
 
-    return () => {
-      closeOneTap();
-      if (containerElement) {
-        containerElement.innerHTML = "";
-      }
-    };
-  }, [enabled, updateConfig]);
+    return destroyWidget;
+  }, [enabled, config.accessToken, updateConfig]);
 
   const fetchAdminGroups = useCallback(async () => {
     const currentConfig = configRef.current;
@@ -569,6 +567,9 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
       deviceId: undefined,
       scope: undefined,
     }));
+    setGroupsError(null);
+    setAuthError(null);
+    setAuthMessage(null);
   };
 
   const selectedCount = communities.filter((community) => community.isSelected).length;
@@ -642,15 +643,24 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
               {config.userId && (
                 <p className="text-xs text-gray-500">User ID: {config.userId}</p>
               )}
-              <div className="border rounded-lg p-4 bg-gray-50">
-                <div id="vkid-one-tap-container" ref={containerRef} />
-              </div>
-              <p className="text-xs text-gray-500">
-                Sign in with VK ID to refresh your user access token. User tokens are required to fetch communities where you have admin access.
-              </p>
+              {!config.accessToken ? (
+                <>
+                  <div className="border rounded-lg p-4 bg-gray-50">
+                    <div id="vkid-one-tap-container" ref={containerRef} />
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Sign in with VK ID to refresh your user access token. User tokens are required to fetch communities where you have admin access.
+                  </p>
+                </>
+              ) : (
+                <p className="text-xs text-gray-600">
+                  VK ID authorization is active. You can now sync and authorize communities.
+                </p>
+              )}
             </section>
 
-            <section className="space-y-4">
+            {config.accessToken && (
+              <section className="space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h4 className="text-sm font-semibold text-gray-700">Communities</h4>
                 <div className="flex flex-wrap gap-2">
@@ -691,26 +701,46 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
                       <label className="flex items-start gap-3 cursor-pointer">
                         <input
                           type="checkbox"
-                          className="mt-1"
+                          className="mt-1 flex-shrink-0"
                           checked={community.isSelected}
                           onChange={(event) => handleCommunitySelection(community.groupId, event.target.checked)}
                         />
-                        <div>
+                        <div className="w-11 h-11 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center mt-0.5 flex-shrink-0">
+                          {community.photoUrl ? (
+                            <img
+                              src={community.photoUrl}
+                              alt={`${community.name ?? "Community"} avatar`}
+                              className="h-full w-full object-cover"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <span className="text-sm font-semibold text-gray-600">
+                              {(community.name ?? "").trim().charAt(0).toUpperCase() || "?"}
+                            </span>
+                          )}
+                        </div>
+                        <div className="space-y-1 min-w-0">
                           <p className="text-sm font-medium text-gray-800">{community.name}</p>
                           <p className="text-xs text-gray-500">
                             ID: {community.ownerId}
-                            {community.screenName ? ` · @${community.screenName}` : ""}
+                            {community.screenName ? ` - @${community.screenName}` : ""}
                           </p>
                           {community.accessToken ? (
-                            <p className="text-xs text-green-600">
-                              Token ready
-                              {community.accessTokenExpiresAt
-                                ? ` · expires ${new Date(community.accessTokenExpiresAt).toLocaleString()}`
-                                : ""
-                              }
-                            </p>
+                            <>
+                              <p className="text-xs text-green-600">
+                                Token ready
+                                {community.accessTokenExpiresAt
+                                  ? ` - expires ${new Date(community.accessTokenExpiresAt).toLocaleString()}`
+                                  : ""
+                                }
+                              </p>
+                              <p className="text-xs text-gray-500 break-all">Token: {community.accessToken}</p>
+                            </>
                           ) : (
-                            <p className="text-xs text-amber-600">Token missing — authorize this community</p>
+                            <>
+                              <p className="text-xs text-amber-600">Token missing</p>
+                              <p className="text-xs text-gray-500">Token: none</p>
+                            </>
                           )}
                         </div>
                       </label>
@@ -734,9 +764,11 @@ export const VKConfigCard: React.FC<VKConfigCardProps> = ({
                 </p>
               )}
             </section>
+            )}
           </div>
         )}
       </div>
     </Card>
   );
 };
+
