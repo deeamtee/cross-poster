@@ -1,5 +1,21 @@
 import type { AppConfig, TelegramConfig, VKConfig, Platform, PlatformConfig } from "@types";
 
+const createDefaultTelegramConfig = (): TelegramConfig => ({
+  botToken: "",
+  chatId: "",
+});
+
+const createDefaultVkConfig = (): VKConfig => ({
+  accessToken: undefined,
+  accessTokenExpiresAt: undefined,
+  userId: undefined,
+  refreshToken: undefined,
+  scope: undefined,
+  deviceId: undefined,
+  communities: [],
+  lastSyncedAt: undefined,
+});
+
 export const getPlatformConfig = (
   config: AppConfig,
   platform: Platform
@@ -9,13 +25,13 @@ export const getPlatformConfig = (
   if (platform === "telegram") {
     return {
       enabled: platformConfig?.enabled || false,
-      config: (platformConfig?.config as TelegramConfig) || { botToken: "", chatId: "" },
+      config: (platformConfig?.config as TelegramConfig) || createDefaultTelegramConfig(),
     };
   }
 
   return {
     enabled: platformConfig?.enabled || false,
-    config: (platformConfig?.config as VKConfig) || { ownerId: "" },
+    config: (platformConfig?.config as VKConfig) || createDefaultVkConfig(),
   };
 };
 

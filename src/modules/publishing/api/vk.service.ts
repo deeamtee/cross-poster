@@ -1,11 +1,14 @@
-﻿import type { PostDraft, PostResult, VKConfig } from "@types";
-import {
-  mergeVkConfigWithStoredToken,
-  saveVkTokenFromConfig,
-  isVkTokenExpired,
-  refreshVkToken,
-} from '../lib';
+import type { PostDraft, PostResult, VKConfig, VKCommunityToken } from "@types";
+import { mergeVkConfigWithStoredToken, saveVkTokenFromConfig } from '../lib';
 import { authService } from '@modules/auth';
+
+type TargetCommunity = {
+  ownerId: number;
+  accessToken: string;
+  community: VKCommunityToken;
+};
+
+const COMMUNITY_TOKEN_EXPIRATION_BUFFER_MS = 60_000;
 
 export class VKService {
   private config: VKConfig;
@@ -19,9 +22,7 @@ export class VKService {
   private syncConfigWithStorage() {
     const merged = mergeVkConfigWithStoredToken(this.config);
     Object.assign(this.config, merged);
-    if (this.config.accessToken) {
-      saveVkTokenFromConfig(this.config);
-    }
+    saveVkTokenFromConfig(this.config);
   }
 
   private getAuthHeaders(options?: { json?: boolean }): HeadersInit {
@@ -41,145 +42,162 @@ export class VKService {
     return headers;
   }
 
-  private async ensureAccessToken(): Promise<{ ownerId: number; accessToken: string } | { error: string }> {
+  private isCommunityTokenExpired(community: VKCommunityToken): boolean {
+    if (!community.accessTokenExpiresAt) {
+      return false;
+    }
+
+    const expiresAt = Date.parse(community.accessTokenExpiresAt);
+    if (!Number.isFinite(expiresAt)) {
+      return false;
+    }
+
+    return Date.now() >= expiresAt - COMMUNITY_TOKEN_EXPIRATION_BUFFER_MS;
+  }
+
+  private evaluateTargets(): { ready: TargetCommunity[]; issues: PostResult[] } {
     this.syncConfigWithStorage();
 
-    if (!this.config.accessToken) {
-      return { error: 'VK access token is missing. Please authenticate via VK ID.' };
-    }
+    const communities = Array.isArray(this.config.communities) ? this.config.communities : [];
+    const ready: TargetCommunity[] = [];
+    const issues: PostResult[] = [];
 
-    if (isVkTokenExpired(this.config)) {
-      const refreshed = await refreshVkToken(this.config);
-      if (refreshed?.accessToken) {
-        Object.assign(this.config, refreshed);
-      } else {
-        return { error: 'VK access token has expired. Please reauthenticate via VK ID.' };
-      }
-    }
-
-    const ownerId = Number(this.config.ownerId);
-    if (Number.isNaN(ownerId)) {
-      return { error: 'Invalid ownerId for VK. Please provide a valid group or user ID.' };
-    }
-
-    saveVkTokenFromConfig(this.config);
-    return { ownerId, accessToken: this.config.accessToken };
-  }
-
-  async publishPost(post: PostDraft): Promise<PostResult> {
-    const validation = await this.ensureAccessToken();
-    if ('error' in validation) {
-      return {
-        platform: "vk",
-        success: false,
-        error: validation.error,
-      };
-    }
-
-    const { ownerId, accessToken } = validation;
-
-    try {
-      const url = `${this.API_BASE_URL}/vk/post`;
-
-      const requestBody: Record<string, unknown> = {
-        access_token: accessToken,
-        owner_id: ownerId,
-        message: post.content,
-      };
-
-      const response = await fetch(url, {
-        method: "POST",
-        headers: this.getAuthHeaders(),
-        body: JSON.stringify(requestBody),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        return {
-          platform: "vk",
-          success: true,
-          messageId: data.data?.post_id?.toString(),
-        };
+    communities.forEach((community) => {
+      if (!community.isSelected) {
+        return;
       }
 
-      return {
-        platform: "vk",
-        success: false,
-        error: data.error?.message || "VK API returned an error",
-      };
-    } catch (error) {
-      return {
-        platform: "vk",
-        success: false,
-        error: error instanceof Error ? error.message : "Network error",
-      };
-    }
-  }
+      const displayName = community.name || `Group ${community.groupId}`;
 
-  async publishPostWithImages(post: PostDraft): Promise<PostResult> {
-    const validation = await this.ensureAccessToken();
-    if ('error' in validation) {
-      return {
-        platform: "vk",
-        success: false,
-        error: validation.error,
-      };
-    }
-
-    const { ownerId, accessToken } = validation;
-
-    try {
-      if (!post.images || post.images.length === 0) {
-        return this.publishPost(post);
-      }
-
-      const attachments = await this.uploadPhotos(post.images, ownerId, accessToken);
-      if (!attachments.success) {
-        return {
-          platform: "vk",
+      if (!community.accessToken || community.accessToken.length === 0) {
+        issues.push({
+          platform: 'vk',
           success: false,
-          error: attachments.error || "Failed to upload images to VK",
-        };
+          error: `Community ${displayName} is not authorized.`,
+        });
+        return;
       }
 
-      const url = `${this.API_BASE_URL}/vk/post`;
+      if (this.isCommunityTokenExpired(community)) {
+        issues.push({
+          platform: 'vk',
+          success: false,
+          error: `Community ${displayName} token has expired.`,
+        });
+        return;
+      }
 
-      const requestBody: Record<string, unknown> = {
+      const ownerId = Number(community.ownerId ?? `-${community.groupId}`);
+      if (!Number.isFinite(ownerId) || ownerId === 0) {
+        issues.push({
+          platform: 'vk',
+          success: false,
+          error: `Community ${displayName} has an invalid owner id.`,
+        });
+        return;
+      }
+
+      ready.push({
+        ownerId,
+        accessToken: community.accessToken,
+        community,
+      });
+    });
+
+    if (ready.length === 0 && issues.length === 0) {
+      issues.push({
+        platform: 'vk',
+        success: false,
+        error: 'No VK communities selected for publishing.',
+      });
+    }
+
+    return { ready, issues };
+  }
+
+  private async publishToCommunity(post: PostDraft, target: TargetCommunity): Promise<PostResult> {
+    const { ownerId, accessToken, community } = target;
+    const displayName = community.name || `Group ${community.groupId}`;
+
+    try {
+      let attachments: string[] | undefined;
+
+      if (post.images && post.images.length > 0) {
+        const uploadResult = await this.uploadPhotos(post.images, ownerId, accessToken);
+        if (!uploadResult.success) {
+          return {
+            platform: 'vk',
+            success: false,
+            error: `[${displayName}] ${uploadResult.error || 'Failed to upload images to VK.'}`,
+          };
+        }
+        attachments = uploadResult.data;
+      }
+
+      const body: Record<string, unknown> = {
         access_token: accessToken,
         owner_id: ownerId,
         message: post.content,
-        attachments: attachments.data,
       };
 
-      const response = await fetch(url, {
-        method: "POST",
+      if (attachments && attachments.length > 0) {
+        body.attachments = attachments;
+      }
+
+      const response = await fetch(`${this.API_BASE_URL}/vk/post`, {
+        method: 'POST',
         headers: this.getAuthHeaders(),
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify(body),
       });
 
       const data = await response.json();
 
       if (data.success) {
+        const postId = data.data?.post_id;
         return {
-          platform: "vk",
+          platform: 'vk',
           success: true,
-          messageId: data.data?.post_id?.toString(),
+          messageId: typeof postId !== 'undefined' ? `${ownerId}_${postId}` : ownerId.toString(),
         };
       }
 
       return {
-        platform: "vk",
+        platform: 'vk',
         success: false,
-        error: data.error?.message || "VK API returned an error",
+        error: `[${displayName}] ${data.error?.message || 'VK API returned an error.'}`,
       };
     } catch (error) {
       return {
-        platform: "vk",
+        platform: 'vk',
         success: false,
-        error: error instanceof Error ? error.message : "Network error",
+        error: `[${displayName}] ${error instanceof Error ? error.message : 'Network error.'}`,
       };
     }
+  }
+
+  private async publishToTargets(post: PostDraft): Promise<PostResult[]> {
+    const { ready, issues } = this.evaluateTargets();
+
+    if (ready.length === 0) {
+      return issues;
+    }
+
+    const results: PostResult[] = [...issues];
+
+    for (const target of ready) {
+      const result = await this.publishToCommunity(post, target);
+      results.push(result);
+    }
+
+    return results;
+  }
+
+  async publishPost(post: PostDraft): Promise<PostResult[]> {
+    return this.publishToTargets(post);
+  }
+
+  async publishPostWithImages(post: PostDraft): Promise<PostResult[]> {
+    return this.publishToTargets(post);
   }
 
   private async uploadPhotos(
@@ -192,12 +210,12 @@ export class VKService {
 
       for (const photo of photos) {
         const formData = new FormData();
-        formData.append("photo", photo, photo.name);
-        formData.append("access_token", accessToken);
-        formData.append("owner_id", ownerId.toString());
+        formData.append('photo', photo, photo.name);
+        formData.append('access_token', accessToken);
+        formData.append('owner_id', ownerId.toString());
 
         const response = await fetch(`${this.API_BASE_URL}/vk/uploadPhoto`, {
-          method: "POST",
+          method: 'POST',
           headers: this.getAuthHeaders({ json: false }),
           body: formData,
         });
@@ -207,7 +225,7 @@ export class VKService {
         if (!data.success) {
           return {
             success: false,
-            error: data.error?.message || "VK API returned an error during photo upload",
+            error: data.error?.message || 'VK API returned an error during photo upload.',
           };
         }
 
@@ -223,7 +241,7 @@ export class VKService {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Network error",
+        error: error instanceof Error ? error.message : 'Network error.',
       };
     }
   }

@@ -18,14 +18,30 @@ export interface TelegramConfig {
   chatId: string; // Channel username or chat ID
 }
 
+
+export interface VKCommunityToken {
+  groupId: number;
+  ownerId: string; // Negative id for community wall posting
+  name: string;
+  screenName?: string;
+  photoUrl?: string;
+  accessToken?: string;
+  accessTokenExpiresAt?: string;
+  scope?: string;
+  permissions?: string[];
+  obtainedAt?: string;
+  isSelected: boolean;
+}
+
 export interface VKConfig {
-  ownerId: string; // Wall identifier (negative for communities)
-  accessToken?: string; // VK access token obtained via VK ID
-  accessTokenExpiresAt?: string; // ISO string with token expiration time
+  accessToken?: string; // User access token obtained via VK ID
+  accessTokenExpiresAt?: string; // ISO string with user token expiration time
   userId?: string; // VK user ID associated with the token
   refreshToken?: string; // Optional refresh token from VK ID
-  scope?: string; // OAuth scope
+  scope?: string; // OAuth scope for the user token
   deviceId?: string; // Device identifier returned by VK ID (required for refresh)
+  communities: VKCommunityToken[];
+  lastSyncedAt?: string; // Timestamp when communities were last fetched
 }
 // Application state
 export interface AppConfig {

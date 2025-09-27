@@ -1,4 +1,4 @@
-﻿import { useMemo } from 'react';
+import { useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { MainPage } from '@/pages/main-page';
 import { SettingsPage } from '@/pages/settings-page';
@@ -7,6 +7,7 @@ import { AccessKeysPage } from '@/pages/access-keys-page';
 import { LoginPage } from '@/pages/auth-page';
 import { SignUpPage } from '@/pages/auth-page';
 import { PasswordResetPage } from '@/pages/auth-page';
+import { VkCommunityAuthPage } from '@/pages/vk-community-auth-page';
 import { useAuth } from '@modules/auth';
 import { Spinner } from '@/ui/spinner';
 import type { AppConfig } from '@types';
@@ -41,7 +42,7 @@ function App() {
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <Spinner size="lg" className="mx-auto mb-4" />
-          <p className="text-gray-600">Загрузка...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -53,6 +54,7 @@ function App() {
         <Route path="/auth/login" element={<RedirectIfAuthenticated><LoginPage /></RedirectIfAuthenticated>} />
         <Route path="/auth/signup" element={<RedirectIfAuthenticated><SignUpPage /></RedirectIfAuthenticated>} />
         <Route path="/auth/reset-password" element={<RedirectIfAuthenticated><PasswordResetPage /></RedirectIfAuthenticated>} />
+        <Route path="/vk-community-auth" element={<VkCommunityAuthPage />} />
 
         {user ? (
           <>

@@ -1,0 +1,1 @@
+export { VkCommunityAuthPage } from "./VkCommunityAuthPage";

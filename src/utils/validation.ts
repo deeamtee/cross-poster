@@ -19,11 +19,13 @@ export function validatePlatformConfig(platform: PlatformConfig): string[] {
     }
     case 'vk': {
       const vkConfig = platform.config as VKConfig;
-      if (!vkConfig.ownerId) {
-        errors.push('Owner ID is required for VK');
-      }
-      if (!vkConfig.accessToken) {
-        errors.push('VK access token is required. Authorize via VK ID.');
+      const communities = Array.isArray(vkConfig.communities) ? vkConfig.communities : [];
+      const selectedCommunities = communities.filter((community) => community.isSelected);
+
+      if (selectedCommunities.length === 0) {
+        errors.push('Select at least one VK community');
+      } else if (selectedCommunities.some((community) => !community.accessToken)) {
+        errors.push('Authorize selected VK communities to obtain access tokens');
       }
       break;
     }

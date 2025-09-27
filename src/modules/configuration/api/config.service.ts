@@ -1,7 +1,7 @@
-﻿import { encryptionApi, type EncryptedData } from '@/utils/encryption';
+import { encryptionApi, type EncryptedData } from '@/utils/encryption';
 import { authService } from '@modules/auth';
 import { mergeVkConfigWithStoredToken, saveVkTokenFromConfig, clearStoredVkToken } from '@modules/publishing/lib';
-import type { AppConfig, VKConfig, PlatformConfig, TelegramConfig } from '@types';
+import type { AppConfig, VKConfig, VKCommunityToken, PlatformConfig, TelegramConfig } from '@types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000/api';
 
@@ -17,6 +17,146 @@ interface ApiResponsePayload {
     message?: string;
   };
 }
+
+const cloneCommunity = (community: VKCommunityToken): VKCommunityToken => ({
+  ...community,
+  permissions: community.permissions ? [...community.permissions] : undefined,
+});
+
+const createEmptyVkConfig = (): VKConfig => ({
+  accessToken: undefined,
+  accessTokenExpiresAt: undefined,
+  userId: undefined,
+  refreshToken: undefined,
+  scope: undefined,
+  deviceId: undefined,
+  communities: [],
+  lastSyncedAt: undefined,
+});
+
+const normalizeCommunity = (value: unknown): VKCommunityToken | null => {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const source = value as Record<string, unknown>;
+
+  const groupIdSource =
+    typeof source.groupId === 'number'
+      ? source.groupId
+      : typeof source.groupId === 'string'
+      ? Number(source.groupId)
+      : typeof source.id === 'number'
+      ? source.id
+      : typeof source.id === 'string'
+      ? Number(source.id)
+      : undefined;
+
+  if (!Number.isFinite(groupIdSource) || !groupIdSource) {
+    return null;
+  }
+
+  const groupId = Math.abs(Math.trunc(Number(groupIdSource)));
+
+  const ownerIdSource = source.ownerId ?? source.owner_id;
+  let ownerId: string | undefined;
+  if (typeof ownerIdSource === 'string') {
+    ownerId = ownerIdSource.trim();
+  } else if (typeof ownerIdSource === 'number') {
+    ownerId = ownerIdSource.toString();
+  }
+  const normalizedOwnerId =
+    ownerId && ownerId.length > 0 ? (ownerId.startsWith('-') ? ownerId : `-${groupId}`) : `-${groupId}`;
+
+  const nameSource = source.name;
+  const screenNameSource = source.screenName ?? source.screen_name;
+  const photoSource = source.photoUrl ?? source.photo_url ?? source.photo_200 ?? source.photo_100 ?? source.photo_50;
+
+  const permissionsSource = source.permissions;
+  const permissions = Array.isArray(permissionsSource)
+    ? permissionsSource.filter((item): item is string => typeof item === 'string' && item.length > 0)
+    : undefined;
+
+  const accessTokenSource = source.accessToken ?? source.access_token;
+  const accessToken =
+    typeof accessTokenSource === 'string' && accessTokenSource.length > 0 ? accessTokenSource : undefined;
+
+  const expiresAtSource = source.accessTokenExpiresAt ?? source.access_token_expires_at;
+  const accessTokenExpiresAt =
+    typeof expiresAtSource === 'string' && expiresAtSource.length > 0 ? expiresAtSource : undefined;
+
+  const scopeSource = source.scope;
+  const scope = typeof scopeSource === 'string' && scopeSource.length > 0 ? scopeSource : undefined;
+
+  const obtainedAtSource = source.obtainedAt ?? source.obtained_at;
+  const obtainedAt =
+    typeof obtainedAtSource === 'string' && obtainedAtSource.length > 0 ? obtainedAtSource : undefined;
+
+  const isSelectedSource = source.isSelected ?? source.selected;
+  const isSelected =
+    typeof isSelectedSource === 'boolean' ? isSelectedSource : Boolean(accessToken);
+
+  return {
+    groupId,
+    ownerId: normalizedOwnerId,
+    name: typeof nameSource === 'string' && nameSource.length > 0 ? nameSource : String(groupId),
+    screenName: typeof screenNameSource === 'string' && screenNameSource.length > 0 ? screenNameSource : undefined,
+    photoUrl: typeof photoSource === 'string' && photoSource.length > 0 ? photoSource : undefined,
+    accessToken,
+    accessTokenExpiresAt,
+    scope,
+    permissions,
+    obtainedAt,
+    isSelected,
+  };
+};
+
+const normalizeVkConfig = (
+  rawConfig: Partial<VKConfig> & { communities?: unknown; ownerId?: unknown; groupId?: unknown },
+): VKConfig => {
+  const communities = Array.isArray(rawConfig.communities)
+    ? rawConfig.communities
+        .map((community) => normalizeCommunity(community))
+        .filter((community): community is VKCommunityToken => Boolean(community))
+    : [];
+
+  if (
+    communities.length === 0 &&
+    typeof rawConfig.ownerId === 'string' &&
+    rawConfig.ownerId.trim().length > 0
+  ) {
+    const ownerIdValue = rawConfig.ownerId.trim();
+    const ownerIdNumber = Number(ownerIdValue);
+    if (Number.isFinite(ownerIdNumber) && ownerIdNumber !== 0) {
+      const groupId = Math.abs(Math.trunc(ownerIdNumber));
+      communities.push({
+        groupId,
+        ownerId: ownerIdValue.startsWith('-') ? ownerIdValue : `-${groupId}`,
+        name: ownerIdValue,
+        screenName: undefined,
+        photoUrl: undefined,
+        accessToken: undefined,
+        accessTokenExpiresAt: undefined,
+        scope: undefined,
+        permissions: undefined,
+        obtainedAt: undefined,
+        isSelected: true,
+      });
+    }
+  }
+
+  return {
+    accessToken: typeof rawConfig.accessToken === 'string' ? rawConfig.accessToken : undefined,
+    accessTokenExpiresAt:
+      typeof rawConfig.accessTokenExpiresAt === 'string' ? rawConfig.accessTokenExpiresAt : undefined,
+    userId: typeof rawConfig.userId === 'string' ? rawConfig.userId : undefined,
+    refreshToken: typeof rawConfig.refreshToken === 'string' ? rawConfig.refreshToken : undefined,
+    scope: typeof rawConfig.scope === 'string' ? rawConfig.scope : undefined,
+    deviceId: typeof rawConfig.deviceId === 'string' ? rawConfig.deviceId : undefined,
+    communities,
+    lastSyncedAt: typeof rawConfig.lastSyncedAt === 'string' ? rawConfig.lastSyncedAt : undefined,
+  };
+};
 
 const handleVkTokenPersistence = (config: AppConfig): void => {
   const vkPlatform = config.platforms.find((platform: PlatformConfig) => platform.platform === 'vk');
@@ -36,27 +176,28 @@ const sanitizePlatforms = (platforms: PlatformConfig[]): PlatformConfig[] => {
     )
     .map((platformConfig) => {
       if (platformConfig.platform === 'vk') {
-        const rawConfig = platformConfig.config as Partial<VKConfig> & { groupId?: string };
-        const normalizedConfig: VKConfig = {
-          ownerId: typeof rawConfig.ownerId === 'string' && rawConfig.ownerId.length > 0
-            ? rawConfig.ownerId
-            : rawConfig.groupId
-            ? String(rawConfig.groupId)
-            : '',
-          accessToken: rawConfig.accessToken,
-          accessTokenExpiresAt: rawConfig.accessTokenExpiresAt,
-          userId: rawConfig.userId,
-          refreshToken: rawConfig.refreshToken,
-          scope: rawConfig.scope,
-          deviceId: rawConfig.deviceId,
-        };
+        const normalizedConfig = normalizeVkConfig(platformConfig.config as Partial<VKConfig>);
+        const mergedConfig = mergeVkConfigWithStoredToken({
+          ...createEmptyVkConfig(),
+          ...normalizedConfig,
+        });
 
-        const mergedConfig = mergeVkConfigWithStoredToken(normalizedConfig);
         saveVkTokenFromConfig(mergedConfig);
 
         return {
           ...platformConfig,
           config: mergedConfig,
+        };
+      }
+
+      if (platformConfig.platform === 'telegram') {
+        const telegramConfig = platformConfig.config as Partial<TelegramConfig>;
+        return {
+          ...platformConfig,
+          config: {
+            botToken: typeof telegramConfig.botToken === 'string' ? telegramConfig.botToken : '',
+            chatId: typeof telegramConfig.chatId === 'string' ? telegramConfig.chatId : '',
+          },
         };
       }
 
@@ -87,32 +228,27 @@ const withPlatformDefaults = (config: AppConfig): AppConfig => {
       };
 
   const existingVk = existingPlatforms.get('vk');
-  const vkConfig = existingVk?.config as VKConfig | undefined;
+  const sanitizedVk = mergeVkConfigWithStoredToken(
+    existingVk
+      ? {
+          ...createEmptyVkConfig(),
+          ...normalizeVkConfig(existingVk.config as VKConfig),
+        }
+      : createEmptyVkConfig(),
+  );
+
   const vkDefaults: PlatformConfig = existingVk
     ? {
         ...existingVk,
         config: {
-          ownerId: vkConfig?.ownerId ?? '',
-          accessToken: vkConfig?.accessToken,
-          accessTokenExpiresAt: vkConfig?.accessTokenExpiresAt,
-          userId: vkConfig?.userId,
-          refreshToken: vkConfig?.refreshToken,
-          scope: vkConfig?.scope,
-          deviceId: vkConfig?.deviceId,
+          ...sanitizedVk,
+          communities: sanitizedVk.communities.map(cloneCommunity),
         },
       }
     : {
         platform: 'vk',
         enabled: false,
-        config: {
-          ownerId: '',
-          accessToken: undefined,
-          accessTokenExpiresAt: undefined,
-          userId: undefined,
-          refreshToken: undefined,
-          scope: undefined,
-          deviceId: undefined,
-        },
+        config: createEmptyVkConfig(),
       };
 
   return {

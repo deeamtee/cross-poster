@@ -1,7 +1,26 @@
-import type { AppConfig, PostDraft, PublishResponse, PostResult, TelegramConfig, VKConfig, PlatformConfig } from '@types';
+import type {
+  AppConfig,
+  PostDraft,
+  PublishResponse,
+  PostResult,
+  TelegramConfig,
+  VKConfig,
+  PlatformConfig,
+  VKCommunityToken,
+} from '@types';
 import { TelegramService } from './telegram.service';
 import { VKService } from './vk.service';
 import { mergeVkConfigWithStoredToken, saveVkTokenFromConfig } from '../lib';
+
+const hasActiveVkCommunity = (vkConfig?: VKConfig): boolean => {
+  if (!vkConfig || !Array.isArray(vkConfig.communities)) {
+    return false;
+  }
+
+  return vkConfig.communities.some((community: VKCommunityToken) =>
+    community.isSelected && typeof community.accessToken === 'string' && community.accessToken.length > 0,
+  );
+};
 
 export class CrossPosterService {
   private telegramConfig?: TelegramConfig;
@@ -12,7 +31,6 @@ export class CrossPosterService {
   }
 
   updateConfig(config: AppConfig) {
-    // Reset configs
     this.telegramConfig = undefined;
     this.vkConfig = undefined;
 
@@ -33,12 +51,10 @@ export class CrossPosterService {
   }
 
   async publishPost(post: PostDraft, config: AppConfig): Promise<PublishResponse> {
-    // Update config before publishing
     this.updateConfig(config);
 
     const results: PostResult[] = [];
 
-    // Publish to Telegram if configured
     if (this.telegramConfig) {
       const telegramService = new TelegramService(this.telegramConfig);
       const result = post.images && post.images.length > 0
@@ -47,29 +63,20 @@ export class CrossPosterService {
       results.push(result);
     }
 
-    // Publish to VK if configured
     if (this.vkConfig) {
       const mergedVkConfig = mergeVkConfigWithStoredToken(this.vkConfig);
       Object.assign(this.vkConfig, mergedVkConfig);
+      saveVkTokenFromConfig(this.vkConfig);
 
-      if (!this.vkConfig.accessToken) {
-        results.push({
-          platform: 'vk',
-          success: false,
-          error: 'VK access token is missing. ???????? ?? VK ID ? ????????.',
-        });
-      } else {
-        saveVkTokenFromConfig(this.vkConfig);
-        const vkService = new VKService(this.vkConfig);
-        const result = post.images && post.images.length > 0
-          ? await vkService.publishPostWithImages(post)
-          : await vkService.publishPost(post);
-        results.push(result);
-      }
+      const vkService = new VKService(this.vkConfig);
+      const vkResults = post.images && post.images.length > 0
+        ? await vkService.publishPostWithImages(post)
+        : await vkService.publishPost(post);
+      results.push(...vkResults);
     }
 
-    const totalSuccess = results.filter(r => r.success).length;
-    const totalFailure = results.filter(r => !r.success).length;
+    const totalSuccess = results.filter((result) => result.success).length;
+    const totalFailure = results.filter((result) => !result.success).length;
 
     return {
       results,
@@ -79,12 +86,18 @@ export class CrossPosterService {
   }
 
   getConfiguredPlatforms(): string[] {
-    const platforms = [];
-    if (this.telegramConfig) platforms.push('telegram');
-    if (this.vkConfig?.accessToken) platforms.push('vk');
+    const platforms: string[] = [];
+
+    if (this.telegramConfig) {
+      platforms.push('telegram');
+    }
+
+    if (hasActiveVkCommunity(this.vkConfig)) {
+      platforms.push('vk');
+    }
+
     return platforms;
   }
 }
 
-// Export a singleton instance
 export const crossPosterService = new CrossPosterService({ platforms: [] });
