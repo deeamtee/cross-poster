@@ -123,7 +123,7 @@ export class VKService {
       let attachments: string[] | undefined;
 
       if (post.images && post.images.length > 0) {
-        const uploadResult = await this.uploadPhotos(post.images, ownerId, accessToken);
+        const uploadResult = await this.uploadPhotos(post.images, ownerId);
         if (!uploadResult.success) {
           return {
             platform: 'vk',
@@ -203,15 +203,23 @@ export class VKService {
   private async uploadPhotos(
     photos: File[],
     ownerId: number,
-    accessToken: string
   ): Promise<{ success: boolean; data?: string[]; error?: string }> {
+    const userAccessToken = this.config.accessToken?.trim();
+
+    if (!userAccessToken) {
+      return {
+        success: false,
+        error: 'VK ID user token is missing. Please sign in with VK ID to upload images.',
+      };
+    }
+
     try {
       const attachmentIds: string[] = [];
 
       for (const photo of photos) {
         const formData = new FormData();
         formData.append('photo', photo, photo.name);
-        formData.append('access_token', accessToken);
+        formData.append('access_token', userAccessToken);
         formData.append('owner_id', ownerId.toString());
 
         const response = await fetch(`${this.API_BASE_URL}/vk/uploadPhoto`, {
@@ -245,4 +253,5 @@ export class VKService {
       };
     }
   }
+
 }
