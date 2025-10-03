@@ -20,6 +20,12 @@ export function getConfiguredPlatforms(config: AppConfig): Platform[] {
           : false;
       }
 
+      if (platform.platform === "telegram") {
+        const tgConfig = platform.config as TelegramConfig;
+        const channels = Array.isArray(tgConfig.channels) ? tgConfig.channels : [];
+        return channels.some((channel) => channel.isSelected && channel.chatId.trim().length > 0);
+      }
+
       return true;
     })
     .map((platform: PlatformConfig) => platform.platform);
@@ -62,8 +68,12 @@ export function validatePlatformConfig(platformConfig: PlatformConfig): string[]
       if (!tgConfig.botToken) {
         errors.push("Bot Token is required for Telegram");
       }
-      if (!tgConfig.chatId) {
-        errors.push("Chat ID is required for Telegram");
+      const channels = Array.isArray(tgConfig.channels) ? tgConfig.channels : [];
+      const selectedChannels = channels.filter((channel) => channel.isSelected);
+      if (selectedChannels.length === 0) {
+        errors.push("Select at least one Telegram channel");
+      } else if (selectedChannels.some((channel) => channel.chatId.trim().length === 0)) {
+        errors.push("Selected Telegram channels must have a Chat ID");
       }
       break;
     }

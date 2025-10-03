@@ -1,7 +1,7 @@
 import { encryptionApi, type EncryptedData } from '@/utils/encryption';
 import { authService } from '@modules/auth';
 import { mergeVkConfigWithStoredToken, saveVkTokenFromConfig, clearStoredVkToken } from '@modules/publishing/lib';
-import type { AppConfig, VKConfig, VKCommunityToken, PlatformConfig, TelegramConfig } from '@types';
+import type { AppConfig, VKConfig, VKCommunityToken, PlatformConfig, TelegramConfig, TelegramChannel } from '@types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000/api';
 
@@ -23,6 +23,12 @@ const cloneCommunity = (community: VKCommunityToken): VKCommunityToken => ({
   permissions: community.permissions ? [...community.permissions] : undefined,
 });
 
+const cloneTelegramChannel = (channel: TelegramChannel): TelegramChannel => ({
+  chatId: channel.chatId,
+  isSelected: channel.isSelected,
+  label: channel.label,
+});
+
 const createEmptyVkConfig = (): VKConfig => ({
   accessToken: undefined,
   accessTokenExpiresAt: undefined,
@@ -33,6 +39,86 @@ const createEmptyVkConfig = (): VKConfig => ({
   communities: [],
   lastSyncedAt: undefined,
 });
+
+const createEmptyTelegramConfig = (): TelegramConfig => ({
+  botToken: '',
+  channels: [
+    {
+      chatId: '',
+      isSelected: true,
+    },
+  ],
+});
+
+const normalizeTelegramChannel = (value: unknown): TelegramChannel | null => {
+  if (typeof value === 'string') {
+    const chatId = value.trim();
+    if (!chatId) {
+      return null;
+    }
+    return {
+      chatId,
+      isSelected: true,
+    };
+  }
+
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const source = value as Record<string, unknown>;
+  const chatIdSource = source.chatId ?? source.id ?? source.channelId ?? source.channel_id;
+
+  let chatId: string | undefined;
+  if (typeof chatIdSource === 'string') {
+    chatId = chatIdSource.trim();
+  } else if (typeof chatIdSource === 'number') {
+    chatId = chatIdSource.toString();
+  }
+
+  if (typeof chatId !== 'string' || chatId.length === 0) {
+    return null;
+  }
+
+  const labelSource = source.label ?? source.name ?? source.title;
+  const label = typeof labelSource === 'string' && labelSource.trim().length > 0 ? labelSource.trim() : undefined;
+
+  const isSelectedSource = source.isSelected ?? source.selected ?? source.enabled;
+  const isSelected = typeof isSelectedSource === 'boolean' ? isSelectedSource : true;
+
+  return {
+    chatId,
+    isSelected,
+    label,
+  };
+};
+
+const normalizeTelegramConfig = (
+  rawConfig: Partial<TelegramConfig> & { chatId?: unknown; channels?: unknown },
+): TelegramConfig => {
+  const channelsSource = Array.isArray(rawConfig.channels)
+    ? rawConfig.channels
+    : typeof rawConfig.chatId !== 'undefined'
+    ? [rawConfig.chatId]
+    : [];
+
+  const channels = channelsSource
+    .map((channel) => normalizeTelegramChannel(channel))
+    .filter((channel): channel is TelegramChannel => Boolean(channel));
+
+  if (channels.length === 0) {
+    if (typeof rawConfig.chatId === 'string' && rawConfig.chatId.trim().length > 0) {
+      channels.push({ chatId: rawConfig.chatId.trim(), isSelected: true });
+    } else {
+      channels.push({ ...createEmptyTelegramConfig().channels[0] });
+    }
+  }
+
+  return {
+    botToken: typeof rawConfig.botToken === 'string' ? rawConfig.botToken : '',
+    channels: channels.map(cloneTelegramChannel),
+  };
+};
 
 const normalizeCommunity = (value: unknown): VKCommunityToken | null => {
   if (!value || typeof value !== 'object') {
@@ -191,12 +277,12 @@ const sanitizePlatforms = (platforms: PlatformConfig[]): PlatformConfig[] => {
       }
 
       if (platformConfig.platform === 'telegram') {
-        const telegramConfig = platformConfig.config as Partial<TelegramConfig>;
+        const telegramConfig = normalizeTelegramConfig(platformConfig.config as Partial<TelegramConfig>);
         return {
           ...platformConfig,
           config: {
-            botToken: typeof telegramConfig.botToken === 'string' ? telegramConfig.botToken : '',
-            chatId: typeof telegramConfig.chatId === 'string' ? telegramConfig.chatId : '',
+            ...telegramConfig,
+            channels: telegramConfig.channels.map(cloneTelegramChannel),
           },
         };
       }
@@ -209,21 +295,24 @@ const withPlatformDefaults = (config: AppConfig): AppConfig => {
   const existingPlatforms = new Map(config.platforms.map((platformConfig) => [platformConfig.platform, platformConfig]));
 
   const existingTelegram = existingPlatforms.get('telegram');
-  const telegramConfig = existingTelegram?.config as TelegramConfig | undefined;
+  const telegramConfig = existingTelegram
+    ? normalizeTelegramConfig(existingTelegram.config as TelegramConfig)
+    : undefined;
   const telegramDefaults: PlatformConfig = existingTelegram
     ? {
         ...existingTelegram,
-        config: {
-          botToken: telegramConfig?.botToken ?? '',
-          chatId: telegramConfig?.chatId ?? '',
-        },
-      }
+          config: {
+            botToken: telegramConfig?.botToken ?? '',
+          channels: telegramConfig
+              ? telegramConfig.channels.map(cloneTelegramChannel)
+              : createEmptyTelegramConfig().channels.map(cloneTelegramChannel),
+          },
+        }
     : {
         platform: 'telegram',
         enabled: false,
         config: {
-          botToken: '',
-          chatId: '',
+          ...createEmptyTelegramConfig(),
         },
       };
 

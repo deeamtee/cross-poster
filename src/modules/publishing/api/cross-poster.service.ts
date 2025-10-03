@@ -1,4 +1,4 @@
-import type {
+﻿import type {
   AppConfig,
   PostDraft,
   PublishResponse,
@@ -12,15 +12,8 @@ import { TelegramService } from './telegram.service';
 import { VKService } from './vk.service';
 import { mergeVkConfigWithStoredToken, saveVkTokenFromConfig } from '../lib';
 
-const hasActiveVkCommunity = (vkConfig?: VKConfig): boolean => {
-  if (!vkConfig || !Array.isArray(vkConfig.communities)) {
-    return false;
-  }
-
-  return vkConfig.communities.some((community: VKCommunityToken) =>
-    community.isSelected && typeof community.accessToken === 'string' && community.accessToken.length > 0,
-  );
-};
+const hasActiveVkCommunity = (vkConfig?: VKConfig): boolean =>
+  Boolean(vkConfig?.communities?.some((community: VKCommunityToken) => community.isSelected && community.accessToken));
 
 export class CrossPosterService {
   private telegramConfig?: TelegramConfig;
@@ -57,10 +50,11 @@ export class CrossPosterService {
 
     if (this.telegramConfig) {
       const telegramService = new TelegramService(this.telegramConfig);
-      const result = post.images && post.images.length > 0
-        ? await telegramService.publishPostWithImages(post)
-        : await telegramService.publishPost(post);
-      results.push(result);
+      const telegramResults =
+        post.images && post.images.length > 0
+          ? await telegramService.publishPostWithImages(post)
+          : await telegramService.publishPost(post);
+      results.push(...telegramResults);
     }
 
     if (this.vkConfig) {
@@ -69,9 +63,7 @@ export class CrossPosterService {
       saveVkTokenFromConfig(this.vkConfig);
 
       const vkService = new VKService(this.vkConfig);
-      const vkResults = post.images && post.images.length > 0
-        ? await vkService.publishPostWithImages(post)
-        : await vkService.publishPost(post);
+      const vkResults = await vkService.publishPost(post);
       results.push(...vkResults);
     }
 

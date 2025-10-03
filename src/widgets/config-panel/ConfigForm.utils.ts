@@ -2,7 +2,12 @@ import type { AppConfig, TelegramConfig, VKConfig, Platform, PlatformConfig } fr
 
 const createDefaultTelegramConfig = (): TelegramConfig => ({
   botToken: "",
-  chatId: "",
+  channels: [
+    {
+      chatId: "",
+      isSelected: true,
+    },
+  ],
 });
 
 const createDefaultVkConfig = (): VKConfig => ({

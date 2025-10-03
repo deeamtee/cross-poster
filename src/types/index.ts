@@ -13,9 +13,15 @@ export interface PlatformConfig {
   config: TelegramConfig | VKConfig;
 }
 
+export interface TelegramChannel {
+  chatId: string; // Channel username or chat ID
+  isSelected: boolean;
+  label?: string;
+}
+
 export interface TelegramConfig {
   botToken: string;
-  chatId: string; // Channel username or chat ID
+  channels: TelegramChannel[];
 }
 
 

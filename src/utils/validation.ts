@@ -12,8 +12,12 @@ export function validatePlatformConfig(platform: PlatformConfig): string[] {
       if (!tgConfig.botToken) {
         errors.push('Bot Token is required for Telegram');
       }
-      if (!tgConfig.chatId) {
-        errors.push('Chat ID is required for Telegram');
+      const channels = Array.isArray(tgConfig.channels) ? tgConfig.channels : [];
+      const selectedChannels = channels.filter((channel) => channel.isSelected);
+      if (selectedChannels.length === 0) {
+        errors.push('Select at least one Telegram channel');
+      } else if (selectedChannels.some((channel) => channel.chatId.trim().length === 0)) {
+        errors.push('Selected Telegram channels must have a Chat ID');
       }
       break;
     }

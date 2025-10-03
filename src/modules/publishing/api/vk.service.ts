@@ -1,6 +1,6 @@
-import type { PostDraft, PostResult, VKConfig, VKCommunityToken } from "@types";
-import { mergeVkConfigWithStoredToken, saveVkTokenFromConfig } from '../lib';
-import { authService } from '@modules/auth';
+﻿import type { PostDraft, PostResult, VKConfig, VKCommunityToken } from "@types";
+import { mergeVkConfigWithStoredToken, saveVkTokenFromConfig } from "../lib";
+import { authService } from "@modules/auth";
 
 type TargetCommunity = {
   ownerId: number;
@@ -28,7 +28,7 @@ export class VKService {
   private getAuthHeaders(options?: { json?: boolean }): HeadersInit {
     const token = authService.getAccessToken();
     if (!token) {
-      throw new Error('Authentication token missing');
+      throw new Error("Authentication token missing");
     }
 
     const headers: Record<string, string> = {
@@ -36,7 +36,7 @@ export class VKService {
     };
 
     if (options?.json !== false) {
-      headers['Content-Type'] = 'application/json';
+      headers["Content-Type"] = "application/json";
     }
 
     return headers;
@@ -55,46 +55,46 @@ export class VKService {
     return Date.now() >= expiresAt - COMMUNITY_TOKEN_EXPIRATION_BUFFER_MS;
   }
 
-  private evaluateTargets(): { ready: TargetCommunity[]; issues: PostResult[] } {
+  private resolveTargets(): { ready: TargetCommunity[]; issues: PostResult[] } {
     this.syncConfigWithStorage();
 
-    const communities = Array.isArray(this.config.communities) ? this.config.communities : [];
+    const communities = this.config.communities ?? [];
     const ready: TargetCommunity[] = [];
     const issues: PostResult[] = [];
 
-    communities.forEach((community) => {
+    for (const community of communities) {
       if (!community.isSelected) {
-        return;
+        continue;
       }
 
-      const displayName = community.name || `Group ${community.groupId}`;
+      const displayName = community.name ?? `Group ${community.groupId}`;
 
-      if (!community.accessToken || community.accessToken.length === 0) {
+      if (!community.accessToken) {
         issues.push({
-          platform: 'vk',
+          platform: "vk",
           success: false,
           error: `Community ${displayName} is not authorized.`,
         });
-        return;
+        continue;
       }
 
       if (this.isCommunityTokenExpired(community)) {
         issues.push({
-          platform: 'vk',
+          platform: "vk",
           success: false,
           error: `Community ${displayName} token has expired.`,
         });
-        return;
+        continue;
       }
 
       const ownerId = Number(community.ownerId ?? `-${community.groupId}`);
       if (!Number.isFinite(ownerId) || ownerId === 0) {
         issues.push({
-          platform: 'vk',
+          platform: "vk",
           success: false,
           error: `Community ${displayName} has an invalid owner id.`,
         });
-        return;
+        continue;
       }
 
       ready.push({
@@ -102,37 +102,60 @@ export class VKService {
         accessToken: community.accessToken,
         community,
       });
-    });
+    }
 
-    if (ready.length === 0 && issues.length === 0) {
+    if (!ready.length && !issues.length) {
       issues.push({
-        platform: 'vk',
+        platform: "vk",
         success: false,
-        error: 'No VK communities selected for publishing.',
+        error: "No VK communities selected for publishing.",
       });
     }
 
     return { ready, issues };
   }
 
+  private async prepareAttachments(post: PostDraft, ownerId: number): Promise<string[]> {
+    if (!post.images?.length) {
+      return [];
+    }
+
+    const uploads = post.images.map((photo) => this.uploadPhoto(photo, ownerId));
+    return Promise.all(uploads);
+  }
+
+  private async uploadPhoto(photo: File, ownerId: number): Promise<string> {
+    const userAccessToken = this.config.accessToken?.trim();
+    if (!userAccessToken) {
+      throw new Error("VK ID user token is missing. Please sign in with VK ID to upload images.");
+    }
+
+    const formData = new FormData();
+    formData.append("photo", photo, photo.name);
+    formData.append("access_token", userAccessToken);
+    formData.append("owner_id", ownerId.toString());
+
+    const response = await fetch(`${this.API_BASE_URL}/vk/uploadPhoto`, {
+      method: "POST",
+      headers: this.getAuthHeaders({ json: false }),
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (!data.success || !data.data?.attachment) {
+      throw new Error(data.error?.message ?? "VK API returned an error during photo upload.");
+    }
+
+    return data.data.attachment as string;
+  }
+
   private async publishToCommunity(post: PostDraft, target: TargetCommunity): Promise<PostResult> {
     const { ownerId, accessToken, community } = target;
-    const displayName = community.name || `Group ${community.groupId}`;
+    const displayName = community.name ?? `Group ${community.groupId}`;
 
     try {
-      let attachments: string[] | undefined;
-
-      if (post.images && post.images.length > 0) {
-        const uploadResult = await this.uploadPhotos(post.images, ownerId);
-        if (!uploadResult.success) {
-          return {
-            platform: 'vk',
-            success: false,
-            error: `[${displayName}] ${uploadResult.error || 'Failed to upload images to VK.'}`,
-          };
-        }
-        attachments = uploadResult.data;
-      }
+      const attachments = await this.prepareAttachments(post, ownerId);
 
       const body: Record<string, unknown> = {
         access_token: accessToken,
@@ -140,12 +163,12 @@ export class VKService {
         message: post.content,
       };
 
-      if (attachments && attachments.length > 0) {
+      if (attachments.length > 0) {
         body.attachments = attachments;
       }
 
       const response = await fetch(`${this.API_BASE_URL}/vk/post`, {
-        method: 'POST',
+        method: "POST",
         headers: this.getAuthHeaders(),
         body: JSON.stringify(body),
       });
@@ -155,30 +178,30 @@ export class VKService {
       if (data.success) {
         const postId = data.data?.post_id;
         return {
-          platform: 'vk',
+          platform: "vk",
           success: true,
-          messageId: typeof postId !== 'undefined' ? `${ownerId}_${postId}` : ownerId.toString(),
+          messageId: typeof postId !== "undefined" ? `${ownerId}_${postId}` : ownerId.toString(),
         };
       }
 
       return {
-        platform: 'vk',
+        platform: "vk",
         success: false,
-        error: `[${displayName}] ${data.error?.message || 'VK API returned an error.'}`,
+        error: `[${displayName}] ${data.error?.message ?? "VK API returned an error."}`,
       };
     } catch (error) {
       return {
-        platform: 'vk',
+        platform: "vk",
         success: false,
-        error: `[${displayName}] ${error instanceof Error ? error.message : 'Network error.'}`,
+        error: `[${displayName}] ${error instanceof Error ? error.message : "Network error."}`,
       };
     }
   }
 
-  private async publishToTargets(post: PostDraft): Promise<PostResult[]> {
-    const { ready, issues } = this.evaluateTargets();
+  async publishPost(post: PostDraft): Promise<PostResult[]> {
+    const { ready, issues } = this.resolveTargets();
 
-    if (ready.length === 0) {
+    if (!ready.length) {
       return issues;
     }
 
@@ -191,67 +214,4 @@ export class VKService {
 
     return results;
   }
-
-  async publishPost(post: PostDraft): Promise<PostResult[]> {
-    return this.publishToTargets(post);
-  }
-
-  async publishPostWithImages(post: PostDraft): Promise<PostResult[]> {
-    return this.publishToTargets(post);
-  }
-
-  private async uploadPhotos(
-    photos: File[],
-    ownerId: number,
-  ): Promise<{ success: boolean; data?: string[]; error?: string }> {
-    const userAccessToken = this.config.accessToken?.trim();
-
-    if (!userAccessToken) {
-      return {
-        success: false,
-        error: 'VK ID user token is missing. Please sign in with VK ID to upload images.',
-      };
-    }
-
-    try {
-      const attachmentIds: string[] = [];
-
-      for (const photo of photos) {
-        const formData = new FormData();
-        formData.append('photo', photo, photo.name);
-        formData.append('access_token', userAccessToken);
-        formData.append('owner_id', ownerId.toString());
-
-        const response = await fetch(`${this.API_BASE_URL}/vk/uploadPhoto`, {
-          method: 'POST',
-          headers: this.getAuthHeaders({ json: false }),
-          body: formData,
-        });
-
-        const data = await response.json();
-
-        if (!data.success) {
-          return {
-            success: false,
-            error: data.error?.message || 'VK API returned an error during photo upload.',
-          };
-        }
-
-        if (data.data?.attachment) {
-          attachmentIds.push(data.data.attachment as string);
-        }
-      }
-
-      return {
-        success: true,
-        data: attachmentIds,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Network error.',
-      };
-    }
-  }
-
 }
